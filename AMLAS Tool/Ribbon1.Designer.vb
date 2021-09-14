@@ -41,9 +41,11 @@
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AMLAS))
         Me.Tab1 = Me.Factory.CreateRibbonTab
         Me.Navigation = Me.Factory.CreateRibbonGroup
         Me.Button1 = Me.Factory.CreateRibbonButton
+        Me.Button2 = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Navigation.SuspendLayout()
         Me.SuspendLayout()
@@ -52,21 +54,35 @@
         '
         Me.Tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office
         Me.Tab1.Groups.Add(Me.Navigation)
-        Me.Tab1.Label = "TabAddIns"
+        Me.Tab1.Label = "AMLAS"
         Me.Tab1.Name = "Tab1"
         '
         'Navigation
         '
         Me.Navigation.Items.Add(Me.Button1)
+        Me.Navigation.Items.Add(Me.Button2)
         Me.Navigation.Label = "Navigation"
         Me.Navigation.Name = "Navigation"
         '
         'Button1
         '
         Me.Button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Button1.Label = "Test"
+        Me.Button1.Image = CType(resources.GetObject("Button1.Image"), System.Drawing.Image)
+        Me.Button1.Label = "Back to overview"
         Me.Button1.Name = "Button1"
+        Me.Button1.ScreenTip = "Overview page"
         Me.Button1.ShowImage = True
+        Me.Button1.SuperTip = "Go back to overview page"
+        '
+        'Button2
+        '
+        Me.Button2.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Button2.Image = CType(resources.GetObject("Button2.Image"), System.Drawing.Image)
+        Me.Button2.Label = "Back to previous page"
+        Me.Button2.Name = "Button2"
+        Me.Button2.ScreenTip = "Toggle between overview and previous page"
+        Me.Button2.ShowImage = True
+        Me.Button2.SuperTip = "Toggle page"
         '
         'AMLAS
         '
@@ -84,6 +100,7 @@
     Friend WithEvents Tab1 As Microsoft.Office.Tools.Ribbon.RibbonTab
     Friend WithEvents Navigation As Microsoft.Office.Tools.Ribbon.RibbonGroup
     Friend WithEvents Button1 As Microsoft.Office.Tools.Ribbon.RibbonButton
+    Friend WithEvents Button2 As Microsoft.Office.Tools.Ribbon.RibbonButton
 End Class
 
 Partial Class ThisRibbonCollection
