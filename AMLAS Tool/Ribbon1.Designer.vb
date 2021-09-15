@@ -46,13 +46,17 @@
         Me.Navigation = Me.Factory.CreateRibbonGroup
         Me.Button1 = Me.Factory.CreateRibbonButton
         Me.Button2 = Me.Factory.CreateRibbonButton
+        Me.Group1 = Me.Factory.CreateRibbonGroup
+        Me.Button3 = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Navigation.SuspendLayout()
+        Me.Group1.SuspendLayout()
         Me.SuspendLayout()
         '
         'Tab1
         '
         Me.Tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office
+        Me.Tab1.Groups.Add(Me.Group1)
         Me.Tab1.Groups.Add(Me.Navigation)
         Me.Tab1.Label = "AMLAS"
         Me.Tab1.Name = "Tab1"
@@ -84,6 +88,17 @@
         Me.Button2.ShowImage = True
         Me.Button2.SuperTip = "Toggle page"
         '
+        'Group1
+        '
+        Me.Group1.Items.Add(Me.Button3)
+        Me.Group1.Label = "Create new"
+        Me.Group1.Name = "Group1"
+        '
+        'Button3
+        '
+        Me.Button3.Label = "Create new doc"
+        Me.Button3.Name = "Button3"
+        '
         'AMLAS
         '
         Me.Name = "AMLAS"
@@ -93,6 +108,8 @@
         Me.Tab1.PerformLayout()
         Me.Navigation.ResumeLayout(False)
         Me.Navigation.PerformLayout()
+        Me.Group1.ResumeLayout(False)
+        Me.Group1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -101,6 +118,8 @@
     Friend WithEvents Navigation As Microsoft.Office.Tools.Ribbon.RibbonGroup
     Friend WithEvents Button1 As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents Button2 As Microsoft.Office.Tools.Ribbon.RibbonButton
+    Friend WithEvents Group1 As Microsoft.Office.Tools.Ribbon.RibbonGroup
+    Friend WithEvents Button3 As Microsoft.Office.Tools.Ribbon.RibbonButton
 End Class
 
 Partial Class ThisRibbonCollection
