@@ -4,9 +4,9 @@
 
 
 Public Class ThisAddIn
+
     Dim stage_colour(7) As String
     Dim stages(7) As String
-
 
 
 
@@ -30,13 +30,14 @@ Public Class ThisAddIn
 
     Private Sub Application_ShapeAdded(Shape As Shape) Handles Application.ShapeAdded
         Dim vsoMaster As Visio.Master
+        Dim visioDocs As Visio.Documents = Me.Application.Documents
 
         'Get the Master property of the shape. 
         vsoMaster = Shape.Master
 
         'Check whether the shape has a master. If not, 
         'the shape was created locally. 
-        If Not (vsoMaster Is Nothing) Then
+        If Not vsoMaster Is Nothing Then
 
             For i = 1 To stages.Length - 1
                 If AMLAS_Tool.Globals.ThisAddIn.Application.ActivePage.Name.Contains(stages(i)) Then
@@ -45,7 +46,6 @@ Public Class ThisAddIn
                     End If
                 End If
             Next i
-
 
         End If
 
