@@ -10,6 +10,7 @@ Public Class AMLAS
         Button3.Label = "Create"
         Button4.Label = "Toggle between" & vbCrLf & "process && arg"
         Group1.Label = "Create new doc" & vbCrLf & "from AMLAS Template"
+
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As RibbonControlEventArgs) Handles Button1.Click
@@ -39,6 +40,7 @@ Public Class AMLAS
         Dim currentpage As String
         Dim page As Visio.Page
         Try
+
 
             currentpage = Globals.ThisAddIn.Application.ActivePage.Name
             For i = 1 To stages.Length - 1
