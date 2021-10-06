@@ -49,7 +49,6 @@ Public Class ThisAddIn
                         If vsoMaster.Name.Contains("Justification") Or vsoMaster.Name.Contains("Assumption") Then
                             For Each shapewithin As Visio.Shape In Shape.Shapes
                                 shapewithin.CellsU("Fillforegnd").FormulaU = stage_colour(i)
-                                'shapewithin.CellsU("FillBkgnd").FormulaU = "THEMEGUARD(SHADE(FillForegnd,LUMDIFF(THEMEVAL(""FillColor""),THEMEVAL(""FillColor2""))))"
                             Next shapewithin
                         Else
                             Shape.CellsU("Fillforegnd").FormulaU = stage_colour(i)
@@ -63,4 +62,5 @@ Public Class ThisAddIn
 
     End Sub
 End Class
+
 
