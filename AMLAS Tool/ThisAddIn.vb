@@ -2,7 +2,6 @@
 
 
 
-
 Public Class ThisAddIn
 
     Dim stage_colour(7) As String
@@ -20,7 +19,6 @@ Public Class ThisAddIn
         stage_colour(4) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor""),60))"
         stage_colour(5) = "THEMEGUARD(MSOTINT(RGB(255,255,255),-15))"
         stage_colour(6) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor2""),60))"
-
 
     End Sub
 
@@ -42,8 +40,8 @@ Public Class ThisAddIn
         'Check whether the shape has a master. If not, 
         'the shape was created locally. 
         If Not vsoMaster Is Nothing Then
-                'create background colour for dropped shapes
-                For i = 1 To stages.Length - 1
+            'create background colour for dropped shapes
+            For i = 1 To stages.Length - 1
                 If activePage.Contains(stages(i)) Then
                     If Not vsoMaster.Name.Contains("Document") Then 'documents have no colour
                         If vsoMaster.Name.Contains("Justification") Or vsoMaster.Name.Contains("Assumption") Then
@@ -58,9 +56,12 @@ Public Class ThisAddIn
 
             Next i
 
-            End If
+        End If
 
     End Sub
+
+
+
 End Class
 
 

@@ -10,6 +10,7 @@ Public Class AMLAS
         Button3.Label = "Create"
         Button4.Label = "Toggle between" & vbCrLf & "process && arg"
         Group1.Label = "Create new doc" & vbCrLf & "from AMLAS Template"
+        prevPage = Globals.ThisAddIn.Application.ActivePage.Name
 
     End Sub
 
@@ -20,6 +21,8 @@ Public Class AMLAS
         Catch ex As System.NullReferenceException
             MsgBox("Please load a document or click Create " & vbCrLf & "button to create new from template.", MsgBoxStyle.Exclamation)
         End Try
+
+
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As RibbonControlEventArgs) Handles Button2.Click
@@ -31,7 +34,7 @@ Public Class AMLAS
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As RibbonControlEventArgs) Handles Button3.Click
-        Dim docPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\Visio Add In\AMLAS Tool.vstx"
+        Dim docPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\Visio Add In\AMLAS Tool.vstm"
         Globals.ThisAddIn.Application.Documents.Add(docPath)
         Globals.ThisAddIn.Application.ActiveWindow.Page = "AMLAS Process Overview"
     End Sub
