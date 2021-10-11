@@ -3,7 +3,7 @@
 
 
 Public Class ThisAddIn
-
+    'global consts for colours
     Dim stage_colour(7) As String
     Dim stages(7) As String
 
@@ -11,14 +11,16 @@ Public Class ThisAddIn
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
 
-        stages = {"", "Stage 1", "Stage 2", "Stage 3", "Stage 4", "Stage 5", "Stage 6"}
-
+        stages = {"", "Stage 1", "Stage 2", "Stage 3", "Stage 4", "Stage 5", "Stage 6"} 'amlas overview index is zero
+        'colours need to be formatted for shapesheet entries, not RGB
         stage_colour(1) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor6""),60))"
         stage_colour(2) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor5""),60))"
         stage_colour(3) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor4""),60))"
         stage_colour(4) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor""),60))"
         stage_colour(5) = "THEMEGUARD(MSOTINT(RGB(255,255,255),-15))"
         stage_colour(6) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor2""),60))"
+
+
 
     End Sub
 
@@ -27,6 +29,7 @@ Public Class ThisAddIn
     End Sub
 
     Private Sub Application_ShapeAdded(Shape As Shape) Handles Application.ShapeAdded
+        'on drop, add stage colour to shape and prompt user to enter shape data
         Dim vsoMaster As Visio.Master
         Dim visioDocs As Visio.Documents = Me.Application.Documents
         Dim activePage As String
@@ -34,8 +37,6 @@ Public Class ThisAddIn
         activePage = Globals.ThisAddIn.Application.ActivePage.Name
         'Get the Master property of the shape. 
         vsoMaster = Shape.Master
-
-
 
         'Check whether the shape has a master. If not, 
         'the shape was created locally. 
@@ -57,6 +58,12 @@ Public Class ThisAddIn
             Next i
 
         End If
+
+        'shape data 
+
+
+
+
 
     End Sub
 

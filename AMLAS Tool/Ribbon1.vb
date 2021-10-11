@@ -1,7 +1,7 @@
 ﻿Imports Microsoft.Office.Tools.Ribbon
 
 Public Class AMLAS
-    Dim prevPage
+    Dim prevPage As String
     Dim stages(7) As String
 
     Private Sub Ribbon1_Load(ByVal sender As System.Object, ByVal e As RibbonUIEventArgs) Handles MyBase.Load
@@ -10,11 +10,15 @@ Public Class AMLAS
         Button3.Label = "Create"
         Button4.Label = "Toggle between" & vbCrLf & "process && arg"
         Group1.Label = "Create new doc" & vbCrLf & "from AMLAS Template"
-        prevPage = Globals.ThisAddIn.Application.ActivePage.Name
+
+        prevPage = "AMLAS Process Overview"
 
     End Sub
 
+
+
     Private Sub Button1_Click(sender As Object, e As RibbonControlEventArgs) Handles Button1.Click
+        'home page button
         Try
             prevPage = Globals.ThisAddIn.Application.ActivePage.Name
             Globals.ThisAddIn.Application.ActiveWindow.Page = "AMLAS Process Overview"
@@ -22,10 +26,10 @@ Public Class AMLAS
             MsgBox("Please load a document or click Create " & vbCrLf & "button to create new from template.", MsgBoxStyle.Exclamation)
         End Try
 
-
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As RibbonControlEventArgs) Handles Button2.Click
+        'previous page button
         Try
             Globals.ThisAddIn.Application.ActiveWindow.Page = prevPage
         Catch ex As System.NullReferenceException
@@ -34,19 +38,21 @@ Public Class AMLAS
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As RibbonControlEventArgs) Handles Button3.Click
+        'create new document by copying template with macros (needs some code for file open dialogue box if AMLAS Tool.vstm template not found)
         Dim docPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\Visio Add In\AMLAS Tool.vstm"
+
         Globals.ThisAddIn.Application.Documents.Add(docPath)
         Globals.ThisAddIn.Application.ActiveWindow.Page = "AMLAS Process Overview"
     End Sub
 
     Private Sub Button4_Click(sender As Object, e As RibbonControlEventArgs) Handles Button4.Click
+        'toggle button between process and argument
         Dim currentpage As String
         Dim page As Visio.Page
         Try
 
-
             currentpage = Globals.ThisAddIn.Application.ActivePage.Name
-            For i = 1 To stages.Length - 1
+            For i = 1 To stages.Length - 1      'skip overview page i=0
                 If currentpage.Contains(stages(i)) Then
 
                     For Each page In Globals.ThisAddIn.Application.ActiveDocument.Pages

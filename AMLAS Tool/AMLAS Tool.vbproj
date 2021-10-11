@@ -213,7 +213,7 @@
       <DependentUpon>Ribbon1.vb</DependentUpon>
     </EmbeddedResource>
     <None Include="AMLAS Tool Stencil.vssx" />
-    <None Include="AMLAS Tool.vstx" />
+    <None Include="AMLAS Tool.vstm" />
     <None Include="AMLAS Tool_TemporaryKey.pfx" />
     <None Include="app.config" />
     <None Include="ThisAddIn.Designer.xml">
