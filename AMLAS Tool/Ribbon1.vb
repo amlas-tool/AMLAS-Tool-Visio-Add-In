@@ -39,6 +39,8 @@ Public Class AMLAS
 
     Private Sub Button3_Click(sender As Object, e As RibbonControlEventArgs) Handles Button3.Click
         'create new document by copying template with macros (needs some code for file open dialogue box if AMLAS Tool.vstm template not found)
+        'NB path locally used for git is C:\Users\Admin\source\repos\AMLAS Tool\AMLAS Tool\AMLAS Tool.vstm
+        'need to manually copy that over if you want git to update it
         Dim docPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\Visio Add In\AMLAS Tool.vstm"
 
         Globals.ThisAddIn.Application.Documents.Add(docPath)
