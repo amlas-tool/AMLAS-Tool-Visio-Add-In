@@ -59,16 +59,47 @@ Public Class ThisAddIn
 
         End If
 
-        'shape data?
-
-
-
 
 
     End Sub
 
+    Private Sub Application_ShapeChanged(Shape As Shape) Handles Application.ShapeChanged
+        Dim message As String
+        Dim currentpage As String
+        Dim correspondingArgPage As String = ""
+        Dim page As Visio.Page
+
+        If Shape.Name.Contains("Document") Then
+            'create context referenced from this shape in corresponding stage argument
+            If MsgBox("Create referenced context in corresponding argument?", MsgBoxStyle.OkCancel, "Create context") Then
+
+                currentpage = Globals.ThisAddIn.Application.ActivePage.Name
+                For i = 1 To stages.Length - 1      'skip overview page i=0
+                    If currentpage.Contains(stages(i)) Then
+
+                        For Each page In Globals.ThisAddIn.Application.ActiveDocument.Pages
+                            If page.Name <> currentpage And page.Name.Contains(stages(i)) Then
+                                correspondingArgPage = page.Name
+                            End If
+                        Next page
 
 
+                    End If
+                Next i
+
+                message = Shape.Name & " would become a referenced Context " & Shape.CellsU("Prop.ArtID").FormulaU & " added to:" & vbCrLf & correspondingArgPage & "." & vbCrLf & vbCrLf & "Linkage in the argument for this Context must be done manually."
+
+                MsgBox(message)
+            Else
+                MsgBox("Ok, this document cannot be referenced in the corresponding argument.")
+            End If
+        ElseIf Shape.Name = "Dynamic connector" Then 'format arrow
+            Shape.CellsU("LinePattern").FormulaU = "23"
+            Shape.CellsU("EndArrow").FormulaU = "13"
+
+        End If
+
+    End Sub
 End Class
 
 
