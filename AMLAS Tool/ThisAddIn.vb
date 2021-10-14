@@ -69,9 +69,10 @@ Public Class ThisAddIn
         Dim correspondingArgPage As String = ""
         Dim page As Visio.Page
 
+        'create context referenced from this shape in corresponding stage argument
         If Shape.Name.Contains("Document") Then
-            'create context referenced from this shape in corresponding stage argument
-            If MsgBox("Create referenced context in corresponding argument?", MsgBoxStyle.OkCancel, "Create context") Then
+
+            If MsgBox("Create referenced context in corresponding argument?", MsgBoxStyle.OkCancel, "AMLAS Tool: create context") Then
 
                 currentpage = Globals.ThisAddIn.Application.ActivePage.Name
                 For i = 1 To stages.Length - 1      'skip overview page i=0
@@ -83,7 +84,6 @@ Public Class ThisAddIn
                             End If
                         Next page
 
-
                     End If
                 Next i
 
@@ -93,7 +93,7 @@ Public Class ThisAddIn
             Else
                 MsgBox("Ok, this document cannot be referenced in the corresponding argument.")
             End If
-        ElseIf Shape.Name = "Dynamic connector" Then 'format arrow
+        ElseIf Shape.Name = "Dynamic connector" Then 'format arrow if user adds automatic shape from activity
             Shape.CellsU("LinePattern").FormulaU = "23"
             Shape.CellsU("EndArrow").FormulaU = "13"
 
