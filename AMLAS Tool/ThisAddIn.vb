@@ -21,6 +21,9 @@ Public Class ThisAddIn
         stage_colour(6) = "THEMEGUARD(MSOTINT(THEMEVAL(""AccentColor2""),60))"
 
 
+        'disable developer mode ?
+        'Application.Settings.DeveloperMode
+        'If Application.Settings.DeveloperMode Then Application.Settings.DeveloperMode = Not Application.Settings.DeveloperMode
 
     End Sub
 
