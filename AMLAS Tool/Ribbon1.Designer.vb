@@ -47,8 +47,8 @@
         Me.Button3 = Me.Factory.CreateRibbonButton
         Me.Group2 = Me.Factory.CreateRibbonGroup
         Me.Button1 = Me.Factory.CreateRibbonButton
-        Me.Button2 = Me.Factory.CreateRibbonButton
         Me.Button4 = Me.Factory.CreateRibbonButton
+        Me.Button2 = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
         Me.Group2.SuspendLayout()
@@ -96,6 +96,15 @@
         Me.Button1.ShowImage = True
         Me.Button1.SuperTip = "Go back to overview page"
         '
+        'Button4
+        '
+        Me.Button4.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Button4.Image = CType(resources.GetObject("Button4.Image"), System.Drawing.Image)
+        Me.Button4.ImageName = "Toggle"
+        Me.Button4.Label = "Toggle "
+        Me.Button4.Name = "Button4"
+        Me.Button4.ShowImage = True
+        '
         'Button2
         '
         Me.Button2.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
@@ -105,15 +114,6 @@
         Me.Button2.ScreenTip = "Toggle between overview and previous page"
         Me.Button2.ShowImage = True
         Me.Button2.SuperTip = "Toggle page"
-        '
-        'Button4
-        '
-        Me.Button4.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Button4.Image = CType(resources.GetObject("Button4.Image"), System.Drawing.Image)
-        Me.Button4.ImageName = "Toggle"
-        Me.Button4.Label = "Toggle "
-        Me.Button4.Name = "Button4"
-        Me.Button4.ShowImage = True
         '
         'AMLAS
         '

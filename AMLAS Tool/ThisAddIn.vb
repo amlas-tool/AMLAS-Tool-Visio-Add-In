@@ -67,7 +67,7 @@ Public Class ThisAddIn
     End Sub
 
     Private Sub Application_ShapeChanged(Shape As Shape) Handles Application.ShapeChanged
-        Dim message As String
+        'Dim message As String
         Dim currentpage As String
         Dim correspondingArgPage As String = ""
         Dim page As Visio.Page
@@ -75,9 +75,8 @@ Public Class ThisAddIn
         'create context referenced from this shape in corresponding stage argument
         If Shape.Name.Contains("Document") Then
 
-            If MsgBox("Create referenced context in corresponding argument?", MsgBoxStyle.OkCancel, "AMLAS Tool: create context") Then
 
-                currentpage = Globals.ThisAddIn.Application.ActivePage.Name
+            currentpage = Globals.ThisAddIn.Application.ActivePage.Name
                 For i = 1 To stages.Length - 1      'skip overview page i=0
                     If currentpage.Contains(stages(i)) Then
 
@@ -90,12 +89,9 @@ Public Class ThisAddIn
                     End If
                 Next i
 
-                message = Shape.Name & " would become a referenced Context " & Shape.CellsU("Prop.ArtID").FormulaU & " added to:" & vbCrLf & correspondingArgPage & "." & vbCrLf & vbCrLf & "Linkage in the argument for this Context must be done manually."
+            'message = Shape.Name & " would become a referenced Context " & Shape.CellsU("Prop.ArtID").FormulaU & " added to:" & vbCrLf & correspondingArgPage & "." & vbCrLf & vbCrLf & "Linkage in the argument for this Context must be done manually."
+            'MsgBox(message)
 
-                MsgBox(message)
-            Else
-                MsgBox("Ok, this document cannot be referenced in the corresponding argument.")
-            End If
         ElseIf Shape.Name = "Dynamic connector" Then 'format arrow if user adds automatic shape from activity
             Shape.CellsU("LinePattern").FormulaU = "23"
             Shape.CellsU("EndArrow").FormulaU = "13"
