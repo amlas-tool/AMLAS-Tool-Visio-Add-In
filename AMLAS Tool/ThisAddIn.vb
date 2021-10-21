@@ -77,17 +77,17 @@ Public Class ThisAddIn
 
 
             currentpage = Globals.ThisAddIn.Application.ActivePage.Name
-                For i = 1 To stages.Length - 1      'skip overview page i=0
-                    If currentpage.Contains(stages(i)) Then
+            For i = 1 To stages.Length - 1      'skip overview page i=0
+                If currentpage.Contains(stages(i)) Then
 
-                        For Each page In Globals.ThisAddIn.Application.ActiveDocument.Pages
-                            If page.Name <> currentpage And page.Name.Contains(stages(i)) Then
-                                correspondingArgPage = page.Name
-                            End If
-                        Next page
+                    For Each page In Globals.ThisAddIn.Application.ActiveDocument.Pages
+                        If page.Name <> currentpage And page.Name.Contains(stages(i)) Then
+                            correspondingArgPage = page.Name
+                        End If
+                    Next page
 
-                    End If
-                Next i
+                End If
+            Next i
 
             'message = Shape.Name & " would become a referenced Context " & Shape.CellsU("Prop.ArtID").FormulaU & " added to:" & vbCrLf & correspondingArgPage & "." & vbCrLf & vbCrLf & "Linkage in the argument for this Context must be done manually."
             'MsgBox(message)
@@ -99,6 +99,8 @@ Public Class ThisAddIn
         End If
 
     End Sub
+
+
 End Class
 
 
