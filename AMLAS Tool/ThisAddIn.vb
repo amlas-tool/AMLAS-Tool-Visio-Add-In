@@ -68,9 +68,10 @@ Public Class ThisAddIn
 
     Private Sub Application_ShapeChanged(Shape As Shape) Handles Application.ShapeChanged
         'Dim message As String
-        Dim currentpage As String
+        Dim currentpage, desc As String
         Dim correspondingArgPage As String = ""
         Dim page As Visio.Page
+
 
         'create context referenced from this shape in corresponding stage argument
         If Shape.Name.Contains("Document") Then
@@ -92,6 +93,8 @@ Public Class ThisAddIn
             'message = Shape.Name & " would become a referenced Context " & Shape.CellsU("Prop.ArtID").FormulaU & " added to:" & vbCrLf & correspondingArgPage & "." & vbCrLf & vbCrLf & "Linkage in the argument for this Context must be done manually."
             'MsgBox(message)
 
+
+
         ElseIf Shape.Name = "Dynamic connector" Then 'format arrow if user adds automatic shape from activity
             Shape.CellsU("LinePattern").FormulaU = "23"
             Shape.CellsU("EndArrow").FormulaU = "13"
@@ -100,7 +103,24 @@ Public Class ThisAddIn
 
     End Sub
 
+    Private Sub Application_FormulaChanged(Cell As Cell) Handles Application.FormulaChanged
+        Dim d As String
+        'formatting of desciption property on documents as requested by Richard Hawkins
+        'if string entered for file path, strip {} and replace with []
 
+        'try to only strip if shape data field is changed
+        If Cell.Name = "Prop.Inst_statement" And Cell.Shape.Name.Contains("Document") Then
+            If Cell.FormulaU <> "" Then
+                d = Cell.Shape.CellsU("Prop.Description").FormulaU
+                d = d.Replace("}", "]")
+                d = d.Replace("{", "[")
+                Cell.Shape.CellsU("Prop.Description").FormulaU = d
+            End If
+
+        End If
+
+
+    End Sub
 End Class
 
 
