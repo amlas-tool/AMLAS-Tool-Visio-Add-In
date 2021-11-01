@@ -48,7 +48,7 @@ Public Class ThisAddIn
             For i = 1 To stages.Length - 1
                 If activePage.Contains(stages(i)) Then
                     If Not vsoMaster.Name.Contains("Document") Then 'documents have no colour
-                        If vsoMaster.Name.Contains("Justification") Or vsoMaster.Name.Contains("Assumption") Then
+                        If vsoMaster.Name.Contains("Justification") Or vsoMaster.Name.Contains("Assumption") Or vsoMaster.Name.Contains("solution") Then
                             For Each shapewithin As Visio.Shape In Shape.Shapes
                                 shapewithin.CellsU("Fillforegnd").FormulaU = stage_colour(i)
                             Next shapewithin
