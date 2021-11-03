@@ -119,7 +119,19 @@ Public Class ThisAddIn
 
         End If
 
+    End Sub
 
+
+
+    Private Sub Application_ViewChanged(Window As Window) Handles Application.ViewChanged
+        'Globals.Ribbons.Ribbon1.prevPage = Globals.ThisAddIn.Application.ActivePage.Name
+    End Sub
+
+    Private Sub Application_BeforeModal(app As Application) Handles Application.BeforeModal
+        'catch prevPage for button2 on ribbon after loading dialogue box to switch to page
+        If Not IsNothing(Globals.ThisAddIn.Application.ActivePage) Then
+            Globals.Ribbons.Ribbon1.prevPage = Globals.ThisAddIn.Application.ActivePage.Name
+        End If
     End Sub
 End Class
 
