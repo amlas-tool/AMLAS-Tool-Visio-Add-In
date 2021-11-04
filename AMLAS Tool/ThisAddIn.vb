@@ -50,7 +50,9 @@ Public Class ThisAddIn
                     If Not vsoMaster.Name.Contains("Document") Then 'documents have no colour
                         If vsoMaster.Name.Contains("Justification") Or vsoMaster.Name.Contains("Assumption") Or vsoMaster.Name.Contains("solution") Then
                             For Each shapewithin As Visio.Shape In Shape.Shapes
-                                shapewithin.CellsU("Fillforegnd").FormulaU = stage_colour(i)
+                                If Not shapewithin.IsDataGraphicCallout Then
+                                    shapewithin.CellsU("Fillforegnd").FormulaU = stage_colour(i)
+                                End If
                             Next shapewithin
                         Else
                             Shape.CellsU("Fillforegnd").FormulaU = stage_colour(i)
