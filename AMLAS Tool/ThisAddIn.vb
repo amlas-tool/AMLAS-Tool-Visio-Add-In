@@ -108,14 +108,14 @@ Public Class ThisAddIn
     Private Sub Application_FormulaChanged(Cell As Cell) Handles Application.FormulaChanged
         Dim d As String
         'formatting of desciption property on documents as requested by Richard Hawkins
-        'if string entered for file path, strip {} and replace with []
+        'if string entered for file path, strip {} but leave text
 
         'try to only strip if shape data field is changed
         If Cell.Name = "Prop.Inst_statement" And Cell.Shape.Name.Contains("Document") Then
             If Cell.FormulaU <> "" Then
                 d = Cell.Shape.CellsU("Prop.Description").FormulaU
-                d = d.Replace("}", "]")
-                d = d.Replace("{", "[")
+                d = d.Replace("}", "")
+                d = d.Replace("{", "")
                 Cell.Shape.CellsU("Prop.Description").FormulaU = d
             End If
 
