@@ -119,6 +119,7 @@ Public Class ThisAddIn
                 Cell.Shape.CellsU("Prop.Description").FormulaU = d
             End If
 
+
         End If
 
     End Sub
