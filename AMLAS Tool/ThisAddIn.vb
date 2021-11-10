@@ -4,7 +4,7 @@
 
 Public Class ThisAddIn
     'global consts for colours
-    Dim stage_colour(7) As String
+    ReadOnly stage_colour(7) As String
     Dim stages(7) As String
 
 
@@ -43,7 +43,7 @@ Public Class ThisAddIn
 
         'Check whether the shape has a master. If not, 
         'the shape was created locally. 
-        If Not vsoMaster Is Nothing Then
+        If vsoMaster IsNot Nothing Then
             'create background colour for dropped shapes
             For i = 1 To stages.Length - 1
                 If activePage.Contains(stages(i)) Then
@@ -70,8 +70,8 @@ Public Class ThisAddIn
 
     Private Sub Application_ShapeChanged(Shape As Shape) Handles Application.ShapeChanged
         'Dim message As String
-        Dim currentpage, desc As String
-        Dim correspondingArgPage As String = ""
+        Dim currentpage As String
+        Dim correspondingArgPage As String
         Dim page As Visio.Page
 
 
