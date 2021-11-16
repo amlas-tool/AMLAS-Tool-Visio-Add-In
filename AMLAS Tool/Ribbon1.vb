@@ -2,6 +2,7 @@
 
 Public Class AMLAS
     Public prevPage As String
+
     Dim stages(7) As String
 
     Private Sub Ribbon1_Load(ByVal sender As System.Object, ByVal e As RibbonUIEventArgs) Handles MyBase.Load
@@ -41,10 +42,25 @@ Public Class AMLAS
         'create new document by copying template with macros (needs some code for file open dialogue box if AMLAS Tool.vstm template not found)
         'NB path locally used for git is C:\Users\Admin\source\repos\AMLAS Tool\AMLAS Tool\AMLAS Tool.vstm
         'need to manually copy that over if you want git to update it
-        Dim docPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\Visio Add In\AMLAS Tool.vstm"
+        Dim docPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        Dim devPath As String = "\Visio Add In\AMLAS Tool.vstm"
+        Dim userPath As String = "AMLAS Tool.vstm"
 
-        Globals.ThisAddIn.Application.Documents.Add(docPath)
-        Globals.ThisAddIn.Application.ActiveWindow.Page = "AMLAS Process Overview"
+
+        'this needs doing properly before release!
+        Try
+            If My.Computer.FileSystem.FileExists(docPath + devPath) Then
+                Globals.ThisAddIn.Application.Documents.Add(docPath + devPath)
+            Else
+                Globals.ThisAddIn.Application.Documents.Add(docPath + userPath)
+
+
+            End If
+            Globals.ThisAddIn.Application.ActiveWindow.Page = "AMLAS Process Overview"
+        Catch ex As System.DllNotFoundException
+            MsgBox("AMLAS template not found. The template and stencils should be installed in the same directory as the Add In.", vbCritical)
+        End Try
+
     End Sub
 
     Private Sub Button4_Click(sender As Object, e As RibbonControlEventArgs) Handles Button4.Click

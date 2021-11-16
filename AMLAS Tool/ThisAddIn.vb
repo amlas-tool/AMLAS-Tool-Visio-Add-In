@@ -100,7 +100,6 @@ Public Class ThisAddIn
         ElseIf Shape.Name = "Dynamic connector" Then 'format arrow if user adds automatic shape from activity
             Shape.CellsU("LinePattern").FormulaU = "23"
             Shape.CellsU("EndArrow").FormulaU = "13"
-
         End If
 
     End Sub
