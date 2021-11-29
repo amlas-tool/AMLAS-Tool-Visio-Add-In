@@ -209,12 +209,12 @@
         Ci9a7MhYVmrR0o+MZVkgKksNLMuyLMuykujPn/8D4r2a+zX8JNoAAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="Button2.Image" type="System.Drawing.Imaging.Metafile, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="Button2.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAAB8AAAAdCAYAAABSZrcyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAB+SURBVEhL7Y0BBgAxDAT7zf7/IXfCHuesk00rUTIsJToz
-        muYo5pwXnrlYuCT+hNPj73Bq/BtOi7OwMmh0mEwdVBpMFBl0fpgkOih9MMHKoP2Hfdwx6H0wwcqg9cMk
-        0UGpwUSRQafDZOqgisGENpxzKI0bpXGjNG6UxpvDGOMGGaW6imFN42cAAAAASUVORK5CYII=
+        iVBORw0KGgoAAAANSUhEUgAAAB8AAAAdCAYAAABSZrcyAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAW
+        JQAAFiUBSVIk8AAAAH5JREFUSEvtjQEGADEMBPvN/v8hd8Ie56yTTStRMiwlOjOa5ijmnBeeuVi4JP6E
+        0+PvcGr8G06Ls7AyaHSYTB1UGkwUGXR+mCQ6KH0wwcqg/Yd93DHofTDByqD1wyTRQanBRJFBp8Nk6qCK
+        wYQ2nHMojRulcaM0bpTGm8MY4wYZpbqKYU3jZwAAAABJRU5ErkJggg==
 </value>
   </data>
 </root>
