@@ -49,6 +49,7 @@
         Me.Button1 = Me.Factory.CreateRibbonButton
         Me.Button4 = Me.Factory.CreateRibbonButton
         Me.Button2 = Me.Factory.CreateRibbonButton
+        Me.Button5 = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
         Me.Group2.SuspendLayout()
@@ -83,6 +84,7 @@
         Me.Group2.Items.Add(Me.Button1)
         Me.Group2.Items.Add(Me.Button4)
         Me.Group2.Items.Add(Me.Button2)
+        Me.Group2.Items.Add(Me.Button5)
         Me.Group2.Label = "Navigation"
         Me.Group2.Name = "Group2"
         '
@@ -115,6 +117,11 @@
         Me.Button2.ShowImage = True
         Me.Button2.SuperTip = "Toggle page"
         '
+        'Button5
+        '
+        Me.Button5.Label = "Button5"
+        Me.Button5.Name = "Button5"
+        '
         'AMLAS
         '
         Me.Name = "AMLAS"
@@ -137,6 +144,7 @@
     Friend WithEvents Group1 As Microsoft.Office.Tools.Ribbon.RibbonGroup
     Friend WithEvents Button3 As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents Button4 As Microsoft.Office.Tools.Ribbon.RibbonButton
+    Friend WithEvents Button5 As Microsoft.Office.Tools.Ribbon.RibbonButton
 End Class
 
 Partial Class ThisRibbonCollection
