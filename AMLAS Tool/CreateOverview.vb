@@ -659,8 +659,11 @@ Friend Class CreateOverview
         'rc.CellsU("comment").FormulaForce = rStr
 
         'rc.ChangePicture("refresh_update.png")
-        Dim fname As String = My.Computer.FileSystem.CurrentDirectory + "\\refresh_update.png"
-        TryAddImage(stageMultiOverview, fname, x, y, width, height)
+        'Dim fname As String = My.Computer.FileSystem.CurrentDirectory + "\\refresh_update.png"
+        'TryAddImage(stageMultiOverview, fname, x, y, width, height)
+        Dim ac As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).DrawCircularArc(x, y, 0.4, 0, 5.25)
+        ac.CellsU("BeginArrow").FormulaU = "4"
+        ac.CellsU("LineWeight").FormulaU = "7 pt"
     End Sub
     Private Shared Sub TidyShapes()
 

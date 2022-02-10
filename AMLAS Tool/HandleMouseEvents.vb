@@ -195,6 +195,7 @@ Friend Class HandleMouseEvents
                                     'Dim page As String = 
                                     ReplaceShapeWithRectangle(circLeftShape, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(1)), "CircleToSquareLeft", NumSRs.GetNumPerformanceSRs.ToString)
                                     CreateOverview.Update_Overview()
+                                    MsgBox("We have added new instances to Stage 5 Argument Patterns" + vbCrLf + "and updated the Multi-Overview to reflect the additions.")
                                 End If
                             Catch ex As Exception
                                 MsgBox("Please enter a number between 0 to 6.")
@@ -240,6 +241,7 @@ Friend Class HandleMouseEvents
                                     'Dim page As String = "Stage 2: Assurance Argument Pattern for ML Safety Requirements"
                                     ReplaceShapeWithRectangle(circRightShape, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(1)), "CircleToSquareRight", NumSRs.GetNumRobustnessSRs.ToString)
                                     CreateOverview.Update_Overview()
+                                    MsgBox("We have added new instances to Stage 5 Argument Patterns" + vbCrLf + "and updated the Multi-Overview to reflect the additions.")
                                 End If
                             Catch ex As Exception
                                 MsgBox("Please enter a number between 0 to 6.")
@@ -267,7 +269,7 @@ Friend Class HandleMouseEvents
                         'Ask the user which branch (below the diamond) they want deleted
                         ' and delete it.
                         Dim getMessage, Title, DefaultVal, MyValue
-                        getMessage = "Do you want to remove the left or right branch? Input 'left' or 'right' or click Cancel to cancel the action."     ' Set prompt.
+                        getMessage = "Do you want to REMOVE the left or right branch?" + vbCrLf + "Input 'left' or 'right' or click Cancel to cancel the action."     ' Set prompt.
                         Title = "Stage 5: Branching"    ' Set title.
                         DefaultVal = ""    ' Set default.
                         ' Display message, title, and default value.
@@ -301,6 +303,8 @@ Friend Class HandleMouseEvents
                                     'targetShape.ReplaceShape(rep)
                                     'Dim page As String = Globals.ThisAddIn.Application.ActivePage.NameU
                                     ReplaceShapeWithRectangle(targetShape, Globals.ThisAddIn.Application.ActivePage, "DiamondToSquare", Nothing)
+                                    CreateOverview.Update_Overview()
+                                    MsgBox("We have removed the required branch" + vbCrLf + "and updated the Multi-Overview to reflect the removals.")
 
                                 End If
                             Else
