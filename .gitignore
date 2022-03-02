@@ -361,3 +361,49 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_9/Microsoft.Office.Tools.Common.v4.0.Utilities.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_9/AMLAS Tool.vsto
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_9/AMLAS Tool.dll.manifest
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_9/AMLAS Tool.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_9/AMLAS Tool.dll.config.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_8/Microsoft.Office.Tools.Common.v4.0.Utilities.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_8/AMLAS Tool.vsto
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_8/AMLAS Tool.dll.manifest
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_8/AMLAS Tool.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_8/AMLAS Tool.dll.config.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_7/Microsoft.Office.Tools.Common.v4.0.Utilities.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_7/AMLAS Tool.vsto
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_7/AMLAS Tool.dll.manifest
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_7/AMLAS Tool.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_7/AMLAS Tool.dll.config.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_6/Microsoft.Office.Tools.Common.v4.0.Utilities.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_6/AMLAS Tool.vsto
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_6/AMLAS Tool.dll.manifest
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_6/AMLAS Tool.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_6/AMLAS Tool.dll.config.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_5/Microsoft.Office.Tools.Common.v4.0.Utilities.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_5/AMLAS Tool.vsto
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_5/AMLAS Tool.dll.manifest
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_5/AMLAS Tool.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_5/AMLAS Tool.dll.config.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_10/Microsoft.Office.Tools.Common.v4.0.Utilities.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_10/AMLAS Tool.vsto
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_10/AMLAS Tool.dll.manifest
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_10/AMLAS Tool.dll.deploy
+AMLAS Tool/AMLAS_Tool/Application Files/AMLAS Tool_1_0_0_10/AMLAS Tool.dll.config.deploy
+OfficeAddInSetup/OfficeAddInSetup.vdproj
+SetVisioDocProperties/Program.vb
+SetVisioDocProperties/SetVisioDocProperties.vbproj
+SetVisioDocumentProperties/Program.vb
+SetVisioDocumentProperties/SetVisioDocumentProperties.vbproj
+SetVisioDocumentProps/App.config
+SetVisioDocumentProps/Module1.vb
+SetVisioDocumentProps/My Project/Application.Designer.vb
+SetVisioDocumentProps/My Project/Application.myapp
+SetVisioDocumentProps/My Project/AssemblyInfo.vb
+SetVisioDocumentProps/My Project/Resources.Designer.vb
+SetVisioDocumentProps/My Project/Resources.resx
+SetVisioDocumentProps/My Project/Settings.Designer.vb
+SetVisioDocumentProps/My Project/Settings.settings
+SetVisioDocumentProps/SetVisioDocumentProps.vbproj
+VisioSetup.zip

@@ -1,22 +1,43 @@
 ﻿Imports Microsoft.VisualBasic
+Imports System.IO
+Imports System.Runtime.Serialization.Formatters.Binary
+'Public Module Extensions
+'    <System.Runtime.CompilerServices.Extension()>
+'    Public Function DeepCopy(Of T)(ByVal Obj As T) As T
+'        If Obj.GetType().IsSerializable = False Then Return Nothing
 
+'        Using MStream As New MemoryStream
+'            Dim Formatter As New BinaryFormatter
+'            Formatter.Serialize(MStream, Obj)
+'            MStream.Position = 0
+'            Return DirectCast(Formatter.Deserialize(MStream), T)
+'        End Using
+'    End Function
+'End Module
+
+'Class to create the Overview pages from the 6 argument pages.
+'There Shared two Overview pages
+'    Stage 5: Assurance Argument Pattern for ML Verification
+'    Multi-Overview
+'It also updates the Multi-Overview page if the user requests an update.
 Friend Class CreateOverview
-    'Create the Overview pages from the 6 argument pages.
-
+    Shared stageMultiOverview As Integer = 6
     'Get the shapes inside a bounding rectangle
     'For selecting subsets on pages
-    Private Shared Function SelectByRectangularCrossingBox(page As String, lowerleftX As Double, lowerleftY As Double, upperrightX As Double, upperrightY As Double) As Visio.Selection
+    'Private Shared Function SelectByRectangularCrossingBox(page As String, lowerleftX As Double, lowerleftY As Double, upperrightX As Double, upperrightY As Double) As Visio.Selection
+    '
+    '    Dim scopeId As Integer = Globals.ThisAddIn.Application.BeginUndoScope("try")
+    '
+    '    Dim rc As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(page).DrawRectangle(lowerleftX, lowerleftY, upperrightX, upperrightY)
+    '    Dim selected As Visio.Selection = rc.SpatialNeighbors(Visio.VisSpatialRelationCodes.visSpatialContain, 0.01, Visio.VisSpatialRelationFlags.visSpatialIncludeContainerShapes + Visio.VisSpatialRelationFlags.visSpatialIncludeDataGraphics)
+    '
+    '    Globals.ThisAddIn.Application.EndUndoScope(scopeId, False)
+    '    Return selected
+    'End Function
 
-        Dim scopeId As Integer = Globals.ThisAddIn.Application.BeginUndoScope("try")
-
-        Dim rc As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(page).DrawRectangle(lowerleftX, lowerleftY, upperrightX, upperrightY)
-        Dim selected As Visio.Selection = rc.SpatialNeighbors(Visio.VisSpatialRelationCodes.visSpatialContain, 0.01, Visio.VisSpatialRelationFlags.visSpatialIncludeContainerShapes + Visio.VisSpatialRelationFlags.visSpatialIncludeDataGraphics)
-
-        Globals.ThisAddIn.Application.EndUndoScope(scopeId, False)
-        Return selected
-    End Function
-
-    Private Shared Sub GetContainedShapes(page As String, shapes As Visio.Shapes, lowerleftX As Double, lowerleftY As Double, upperrightX As Double, upperrightY As Double, shapesList As List(Of Visio.Shape))
+    'Get the shapes inside a bounding rectangle.
+    'For selecting subsets of shapes on pages.
+    Friend Shared Sub GetContainedShapes(page As String, lowerleftX As Double, lowerleftY As Double, upperrightX As Double, upperrightY As Double, shapesList As List(Of Visio.Shape))
 
         'Dim scopeId As Integer = Globals.ThisAddIn.Application.BeginUndoScope("try")
 
@@ -39,6 +60,9 @@ Friend Class CreateOverview
         'Return shapesList
     End Sub
 
+    'Replace characters in a string using a regex.
+    'This is used to rename the shape refernces on:
+    '    Stage 5: Assurance Argument Pattern for ML Verification
     Private Shared Function ReplaceString(vsoCharacters1 As Visio.Characters, num As Integer, suffix As String) As String
         'Dim vsoCharacters1 As Visio.Characters
         Dim vsoStrng, vsoFind, vsoReplace As String
@@ -50,8 +74,11 @@ Friend Class CreateOverview
         Dim newString As String = System.Text.RegularExpressions.Regex.Replace(vsoStrng, vsoFind, vsoReplace)
         Return newString
     End Function
-    'The code is wrapped around with BeginUndoScope/EndUndoScope to cancel changes.
 
+    'The code is wrapped around with BeginUndoScope/EndUndoScope to cancel changes.
+    'Traverse the set of Argument Pattern pages and get a list of all shapes on each page.
+    'The data structure is a list of lists.
+    ' ^ lists (one per page) each holding a list of all shapes on that page.
     Private Shared Sub GetShapeLists(shapesList As List(Of Visio.Shapes), shpList As List(Of Visio.Shape), coordsList As List(Of System.Drawing.Point), offset As Double)
         Dim pwidth As Double
         Dim pheight As Double
@@ -95,7 +122,7 @@ Friend Class CreateOverview
         pwidth = dbRight - dbLeft
         pheight = dbTop - dbBottom
         System.Diagnostics.Debug.Write("Stage 3: width, height " + pwidth.ToString + "," + pheight.ToString + vbCrLf)
-        Dim p3 As New System.Drawing.Point(-0.9, -2.7)
+        Dim p3 As New System.Drawing.Point(-0.9, -4.7)
         coordsList.Add(p3)
 
         Dim o4Shapes = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(3)).Shapes
@@ -107,7 +134,7 @@ Friend Class CreateOverview
         pwidth = dbRight - dbLeft
         pheight = dbTop - dbBottom
         System.Diagnostics.Debug.Write("Stage 4: width, height " + pwidth.ToString + "," + pheight.ToString + vbCrLf)
-        Dim p4 As New System.Drawing.Point(17.4 + offset, -3.3)
+        Dim p4 As New System.Drawing.Point(19.4 + offset, -4.3)
         coordsList.Add(p4)
 
         'http://visguy.com/vgforum/index.php?topic=7868.0
@@ -126,7 +153,7 @@ Friend Class CreateOverview
         'Dim selectedShapes As Visio.Selection = SelectByRectangularCrossingBox("Assurance Argument Pattern for ML Verification", dblLeft, dblBottom, dblRight, dblTop)
         bwidth = border.Cells("width").ResultIU
         bheight = border.Cells("height").ResultIU
-        GetContainedShapes(ThisAddIn.stageNames(4), o5Shapes, dbLeft, dbBottom, dbRight, dbTop, shpList)
+        GetContainedShapes(ThisAddIn.stageNames(4), dbLeft, dbBottom, dbRight, dbTop, shpList)
 
         border.CellsU("LockAspect").ResultIU = 0
         border.CellsU("LockHeight").ResultIU = 0
@@ -152,7 +179,7 @@ Friend Class CreateOverview
         pwidth = dbRight - dbLeft
         pheight = dbTop - dbBottom
         System.Diagnostics.Debug.Write("Stage 5: width, height " + pwidth.ToString + "," + pheight.ToString + vbCrLf)
-        Dim p5 As New System.Drawing.Point(8.0, -6.1)
+        Dim p5 As New System.Drawing.Point(8.0, -9.1)
         coordsList.Add(p5)
 
         Dim o6Shapes = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(5)).Shapes
@@ -168,13 +195,20 @@ Friend Class CreateOverview
         coordsList.Add(p6)
 
     End Sub
+    'Create the Overviews (2 pages)
     Public Shared Sub Create_Overview(ByVal howMany As Integer, ByVal isLeftCircle As Boolean)
-        Dim widthOffset As Double = 10.5
+        Dim widthOffset As Double = 10.75
         Dim offset As Double
+        Dim otherHowMany As Integer = 0
         If isLeftCircle Then
             offset = (howMany - 1) * widthOffset
+            otherHowMany = NumSRs.GetNumRobustnessSRs()
         Else
             offset = (howMany - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
+            otherHowMany = NumSRs.GetNumPerformanceSRs
+        End If
+        If ((isLeftCircle) And (howMany > 0) And (NumSRs.GetNumRobustnessSRs() > 0)) Then
+            offset = (NumSRs.GetNumRobustnessSRs() - 1) * widthOffset + (howMany * widthOffset)
         End If
 
         Dim suffix As String
@@ -184,8 +218,8 @@ Friend Class CreateOverview
             suffix = "R"
         End If
 
-        Dim stageMultiOverview As Integer = 6
-        Call ThisAddIn.DeleteShapes_Selection(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)))
+        'Dim stageMultiOverview As Integer = 6
+        Call ThisAddIn.DeleteShapes_Selection(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "Buttons")
 
         'Process each stage, get all shapes from the stage in a list, get the height and width of the stage shapes bounding box for layout
         Dim strMasterNames() As String = Nothing 'dummy so we can see the list of pages
@@ -213,137 +247,387 @@ Friend Class CreateOverview
                 If (4 = index) Then 'Stage 5 - treat this differently
                     Dim outline As Visio.Shape = Nothing
                     Dim keep As New List(Of Visio.Shape)
-                    'If we are doing robustness SRs ands we already have performance SRs
-                    ' then we need to add the robustness SRs back in first
-                    If ((Not isLeftCircle) And (NumSRs.GetNumPerformanceSRs() > 0)) Then
-                        'Copy and paste shape to the Overview.
-                        'We exclude some shapes we do not want to copy.
-                        For nextShape = 1 To oShapes.Count
-                            If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References")) Then
-                                Dim srcShape4, dstShape4 As Visio.Shape
-                                srcShape4 = (oShapes.Item(nextShape))
-                                Dim cellX As Double = srcShape4.Cells("PinX").ResultIU
-                                Dim cellY As Double = srcShape4.Cells("PinY").ResultIU
-                                Dim move As Double
-                                move = 0
 
-                                'Paste into Overview
-
-                                dstShape4 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape4, point.X + cellX + move, point.Y + cellY)
-
-                                'Connect the top shape from this stage to the circle where we chose how many copies we wanted
-                                If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
-                                    Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
-                                    Dim fShape As Visio.Shape = Nothing
-                                    'If isLeftCircle Then
-                                    fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
-                                    If (fShape Is Nothing) Then
-                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft")
-                                    End If
-                                    fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
-                                    'cShape.CellsU("LinePattern").ResultIU = 23
-                                End If
-
+                    'Handle special case where we have robustness SRs already and want to add in
+                    'performance SRs. Needs shuffling around.
+                    If ((isLeftCircle) And (howMany > 0) And (NumSRs.GetNumRobustnessSRs() > 0)) Then
+                        Dim toDel As Visio.Shapes = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(4)).Shapes
+                        Dim toDelete As New List(Of Visio.Shape)
+                        Dim shpIdx As Visio.Shape
+                        For Each shpIdx In toDel
+                            'keep the buttons
+                            If (Not shpIdx.Name.Trim().StartsWith("Buttons")) Then
+                                toDelete.Add(shpIdx)
+                            Else
+                                System.Diagnostics.Debug.Write(shpIdx.Name + ", ")
                             End If
-                        Next nextShape
-                    End If
-                    ' Add the shpaes to the overview page in the correct place - with offsetting
-                    ' if we have multiple SRs
-                    For i As Integer = 1 To howMany
-                        'Copy and paste shape to the Overview.
-                        'We exclude some shapes we do not want to copy.
-                        For nextShape = 0 To shpList.Count - 1
-                            If (Not shpList.Item(nextShape).Name.Trim().StartsWith("Banner") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Classic") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not shpList.Item(nextShape).Name.Trim().StartsWith("References")) Then
-                                Dim srcShape4, dstShape4 As Visio.Shape
-                                srcShape4 = (shpList.Item(nextShape))
-                                If i = 1 Then
-                                    keep.Add(srcShape4)
-                                End If
-                                'srcShape44 = (oShapes.Item(nextShape))
-                                Dim cellX As Double = srcShape4.Cells("PinX").ResultIU
-                                Dim cellY As Double = srcShape4.Cells("PinY").ResultIU
-                                Dim move As Double
-                                If isLeftCircle Then
+                        Next
+                        ' Add the shapes to the overview page in the correct place - with offsetting
+                        ' if we have multiple SRs
+                        For i As Integer = 1 To howMany 'Performance SRs
+                            'Copy and paste performance SR shape to the Overview.
+                            'We exclude some shapes we do not want to copy.
+                            suffix = "P"
+                            For nextShape = 0 To shpList.Count - 1
+                                If (Not shpList.Item(nextShape).Name.Trim().StartsWith("Banner") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Classic") And Not shpList.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not shpList.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape4, dstShape4 As Visio.Shape
+                                    srcShape4 = (shpList.Item(nextShape))
+                                    If i = 1 Then
+                                        keep.Add(srcShape4)
+                                    End If
+                                    'srcShape44 = (oShapes.Item(nextShape))
+                                    Dim cellX As Double = srcShape4.Cells("PinX").ResultIU
+                                    Dim cellY As Double = srcShape4.Cells("PinY").ResultIU
+                                    Dim move As Double
                                     move = (i - 1) * widthOffset
-                                Else
-                                    move = (i - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
-                                End If
 
-                                'Paste into Overview
-                                'Dim stage6 As Integer = 6
-                                dstShape4 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape4, point.X + cellX + move, point.Y + cellY)
 
-                                'Amend the shape identifiers in the shape text to reflect how many copies we have
-                                Dim currentVal As Integer = dstShape4.CellsU("LockTextEdit").ResultIU
-                                dstShape4.CellsU("LockTextEdit").ResultIU = 0
-                                Dim newString As String = ReplaceString(dstShape4.Characters, i, suffix)
-                                dstShape4.Text = newString
-                                dstShape4.CellsU("LockTextEdit").ResultIU = currentVal
-                                'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+                                    'Paste into Overview
+                                    'Dim stage6 As Integer = 6
+                                    dstShape4 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape4, point.X + cellX + move, point.Y + cellY)
 
-                                'Connect the top shape from this stage to the circle where we chose how many copies we wanted
-                                If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
-                                    Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
-                                    Dim fShape As Visio.Shape
-                                    If isLeftCircle Then
+                                    'Amend the shape identifiers in the shape text to reflect how many copies we have
+                                    Dim currentVal As Integer = dstShape4.CellsU("LockTextEdit").ResultIU
+                                    dstShape4.CellsU("LockTextEdit").ResultIU = 0
+                                    Dim newString As String = ReplaceString(dstShape4.Characters, i, suffix)
+                                    dstShape4.Text = newString
+                                    dstShape4.CellsU("LockTextEdit").ResultIU = currentVal
+                                    'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+
+                                    'Connect the top shape from this stage to the circle where we chose how many copies we wanted
+                                    If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
+                                        Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
+                                        Dim fShape As Visio.Shape
+
                                         fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
-                                    Else
-                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleRight")
+
+                                        'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
+                                        'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
+                                        fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
+
                                     End If
-                                    'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
-                                    'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
-                                    fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
 
                                 End If
-                                ''Connect the top shape from this stage to the circle where we chose how many copies we wanted
-                                'If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
-                                '    Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
-                                '    'cShape.NameU = "DynamicConnector2-5-" + i.ToString
-                                '    Dim fShape As Visio.Shape
-                                '    Dim fShapeTmp As Visio.Shape
+                                'get a copy of the outlining rectangle and text
+                                If (shpList.Item(nextShape).Name.Trim().StartsWith("Classic")) Then
+                                    'Dim s As String = oShapes.Item(nextShape).Name.Trim()
+                                    outline = shpList.Item(nextShape)
+                                End If
+                            Next nextShape
+                        Next i
+                        Dim stage5 As Integer = 4
+                        'Call ThisAddIn.DeleteShapes_Selection(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)))
+                        'Dim selToDel As Visio.Selection = ThisAddIn.AllShapes_Selection(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)))
+                        For i As Integer = 1 To howMany
+                            'Copy and paste shape to the stage 5 SRs.
+                            'We exclude some shapes we do not want to copy.
+                            Dim move As Double
+                            move = (i - 1) * widthOffset
+
+                            For nextShape = 0 To keep.Count - 1
+                                If (Not keep.Item(nextShape).Name.Trim().StartsWith("Banner") And Not keep.Item(nextShape).Name.Trim().StartsWith("Classic") And Not keep.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not keep.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not keep.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape44, dstShape44 As Visio.Shape
+                                    srcShape44 = (keep.Item(nextShape))
+                                    Dim cellX As Double = srcShape44.Cells("PinX").ResultIU
+                                    Dim cellY As Double = srcShape44.Cells("PinY").ResultIU
+
+
+                                    'Paste into stage 5 Assurance Argument Pattern
+                                    'We alread have it once so paste (howMany - 1) times
+                                    'If (i > 1) Then
+                                    dstShape44 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)).Drop(srcShape44, cellX + move, cellY)
+                                    Dim currentVal As Integer = dstShape44.CellsU("LockTextEdit").ResultIU
+                                    dstShape44.CellsU("LockTextEdit").ResultIU = 0
+                                    Dim newString As String = ReplaceString(dstShape44.Characters, i, suffix)
+                                    dstShape44.Text = newString
+                                    dstShape44.CellsU("LockTextEdit").ResultIU = currentVal
+                                    'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+
+                                    'ThisAddIn.Application_ShapeFill(dstShape44, 5)
+                                    'End If
+
+                                End If
+
+                            Next nextShape
+                            ' Paste a copy of the outlining rectangle and text
+                            If (Not outline Is Nothing) Then
+                                Dim cellX As Double = outline.Cells("PinX").ResultIU
+                                Dim cellY As Double = outline.Cells("PinY").ResultIU
+                                'Dim move As Double
                                 '    If isLeftCircle Then
-                                '        fShapeTmp = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
-                                '        If fShapeTmp IsNot Nothing Then
-                                '            HandleMouseEvents.ReplaceShapeWithRectangle(fShapeTmp, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft", ThisAddIn.getNumPerformanceSRs().ToString)
-                                '        End If
-                                '        fShape = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft")
-
+                                '    If NumSRs.GetNumRobustnessSRs() = 0 Then
+                                '        move = (i - 1) * widthOffset
                                 '    Else
-                                '        fShapeTmp = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleRight")
-                                '        If fShapeTmp IsNot Nothing Then
-                                '            HandleMouseEvents.ReplaceShapeWithRectangle(fShapeTmp, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareRight", ThisAddIn.getNumRobustnessSRs().ToString)
-                                '        End If
-                                '        fShape = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareRight")
+                                '        move = (i - 1) * widthOffset + (leftHowMany * widthOffset)
                                 '    End If
-                                '    'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
-                                '    'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
-                                '    fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
-                                '    'cShape.CellsU("LinePattern").ResultIU = 23
+                                'Else
+                                '    move = (i - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
                                 'End If
-                                'Paste into stage 5 Assurance Argument Pattern
-                                'We alread have it once so paste (howMany - 1) times
-                                'If (i > 1) Then
-                                'dstShape44 = 
-                                'Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Assurance Argument Pattern for ML Verification").Drop(srcShape44, cellX + move, cellY)
-                                'ThisAddIn.Application_ShapeFill(dstShape44, 5)
+                                Dim tmpShape As Visio.Shape
+                                tmpShape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)).Drop(outline, cellX + move, cellY)
+                                If i = 1 Then
+                                    tmpShape.NameU = "ClassicHoldingShape"
+                                    tmpShape.Name = "ClassicHoldingShape"
+                                End If
+                            End If
+
+                        Next
+                        For i As Integer = 1 To NumSRs.GetNumRobustnessSRs
+                            'Copy and paste robustness SR shape to the Overview.
+                            'We exclude some shapes we do not want to copy.
+                            suffix = "R"
+                            For nextShape = 0 To shpList.Count - 1
+                                If (Not shpList.Item(nextShape).Name.Trim().StartsWith("Banner") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Classic") And Not shpList.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not shpList.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape4, dstShape4 As Visio.Shape
+                                    srcShape4 = (shpList.Item(nextShape))
+                                    'If i = 1 Then
+                                    'keep.Add(srcShape4)
+                                    'End If
+                                    'srcShape44 = (oShapes.Item(nextShape))
+                                    Dim cellX As Double = srcShape4.Cells("PinX").ResultIU
+                                    Dim cellY As Double = srcShape4.Cells("PinY").ResultIU
+                                    Dim move As Double
+                                    move = (i - 1) * widthOffset + (howMany * widthOffset)
+
+
+                                    'Paste into Overview
+                                    'Dim stage6 As Integer = 6
+                                    dstShape4 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape4, point.X + cellX + move, point.Y + cellY)
+
+                                    'Amend the shape identifiers in the shape text to reflect how many copies we have
+                                    Dim currentVal As Integer = dstShape4.CellsU("LockTextEdit").ResultIU
+                                    dstShape4.CellsU("LockTextEdit").ResultIU = 0
+                                    Dim newString As String = ReplaceString(dstShape4.Characters, i, suffix)
+                                    dstShape4.Text = newString
+                                    dstShape4.CellsU("LockTextEdit").ResultIU = currentVal
+                                    'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+
+                                    'Connect the top shape from this stage to the circle where we chose how many copies we wanted
+                                    If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
+                                        Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
+                                        Dim fShape As Visio.Shape
+                                        'The right circle will now be a square as we have already processed it.
+                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareRight")
+
+                                        'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
+                                        'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
+                                        fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
+
+                                    End If
+
+                                End If
+                                'get a copy of the outlining rectangle and text
+                                If (shpList.Item(nextShape).Name.Trim().StartsWith("Classic")) Then
+                                    Dim s As String = oShapes.Item(nextShape).Name.Trim()
+                                    outline = shpList.Item(nextShape)
+                                End If
+                            Next nextShape
+                        Next i
+                        For i As Integer = 1 To NumSRs.GetNumRobustnessSRs
+                            'Copy and paste shape to the stage 5 SRs.
+                            'We exclude some shapes we do not want to copy.
+                            Dim move As Double
+                            move = (i - 1) * widthOffset + (howMany * widthOffset)
+                            suffix = "R"
+                            For nextShape = 0 To keep.Count - 1
+                                If (Not keep.Item(nextShape).Name.Trim().StartsWith("Banner") And Not keep.Item(nextShape).Name.Trim().StartsWith("Classic") And Not keep.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not keep.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not keep.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape44, dstShape44 As Visio.Shape
+                                    srcShape44 = (keep.Item(nextShape))
+                                    Dim cellX As Double = srcShape44.Cells("PinX").ResultIU
+                                    Dim cellY As Double = srcShape44.Cells("PinY").ResultIU
+
+
+                                    'Paste into stage 5 Assurance Argument Pattern
+                                    'We alread have it once so paste (howMany - 1) times
+                                    'If (i > 1) Then
+                                    dstShape44 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)).Drop(srcShape44, cellX + move, cellY)
+                                    Dim currentVal As Integer = dstShape44.CellsU("LockTextEdit").ResultIU
+                                    dstShape44.CellsU("LockTextEdit").ResultIU = 0
+                                    Dim newString As String = ReplaceString(dstShape44.Characters, i, suffix)
+                                    dstShape44.Text = newString
+                                    dstShape44.CellsU("LockTextEdit").ResultIU = currentVal
+                                    'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+
+                                    'ThisAddIn.Application_ShapeFill(dstShape44, 5)
+                                    'End If
+
+                                End If
+
+                            Next nextShape
+                            ' Paste a copy of the outlining rectangle and text
+                            If (Not outline Is Nothing) Then
+                                Dim cellX As Double = outline.Cells("PinX").ResultIU
+                                Dim cellY As Double = outline.Cells("PinY").ResultIU
+                                'Dim move As Double
+                                '    If isLeftCircle Then
+                                '    If NumSRs.GetNumRobustnessSRs() = 0 Then
+                                '        move = (i - 1) * widthOffset
+                                '    Else
+                                '        move = (i - 1) * widthOffset + (leftHowMany * widthOffset)
+                                '    End If
+                                'Else
+                                '    move = (i - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
                                 'End If
-
+                                Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)).Drop(outline, cellX + move, cellY)
                             End If
-                            'get a copy of the outlining rectangle and text
-                            If (shpList.Item(nextShape).Name.Trim().StartsWith("Classic")) Then
-                                Dim s As String = oShapes.Item(nextShape).Name.Trim()
-                                outline = shpList.Item(nextShape)
+
+                        Next
+                        ThisAddIn.DeleteShapesBySelection(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)), toDelete)
+                        Dim classShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stage5)).Shapes("ClassicHoldingShape")
+                        classShape.NameU = "Classic"
+                        classShape.Name = "Classic"
+                        '// Delete the selection, if it is not empty:
+                        'If (selToDel.Count > 0) Then
+                        '// This is where shapes get whacked:
+                        ' VJH selToDel.Delete()
+                        'End If
+
+                    Else
+                        'If we are doing robustness SRs ands we already have performance SRs
+                        ' then we need to add the perf SRs back in first
+                        If ((Not isLeftCircle) And (NumSRs.GetNumPerformanceSRs() > 0)) Then
+                            'Copy and paste shape to the Overview.
+                            'We exclude some shapes we do not want to copy.
+                            For nextShape = 1 To oShapes.Count
+                                If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape4, dstShape4 As Visio.Shape
+                                    srcShape4 = (oShapes.Item(nextShape))
+                                    Dim cellX As Double = srcShape4.Cells("PinX").ResultIU
+                                    Dim cellY As Double = srcShape4.Cells("PinY").ResultIU
+                                    Dim move As Double
+                                    move = 0
+
+                                    'Paste into Overview
+
+                                    dstShape4 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape4, point.X + cellX + move, point.Y + cellY)
+
+                                    'Connect the top shape from this stage to the circle where we chose how many copies we wanted
+                                    If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
+                                        Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
+                                        Dim fShape As Visio.Shape = Nothing
+                                        'If isLeftCircle Then
+                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
+                                        If (fShape Is Nothing) Then
+                                            fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft")
+                                        End If
+                                        fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
+                                        'cShape.CellsU("LinePattern").ResultIU = 23
+                                    End If
+
+                                End If
+                            Next nextShape
+                        End If
+                        ' Add the shpaes to the overview page in the correct place - with offsetting
+                        ' if we have multiple SRs
+                        For i As Integer = 1 To howMany
+                            'Copy and paste shape to the Overview.
+                            'We exclude some shapes we do not want to copy.
+                            If isLeftCircle Then
+                                suffix = "P"
+                            Else
+                                suffix = "R"
                             End If
-                        Next nextShape
-                    Next
+                            Dim move As Double
+                            If isLeftCircle Then
+                                move = (i - 1) * widthOffset
+                            Else
+                                move = (i - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
+                            End If
+                            For nextShape = 0 To shpList.Count - 1
+                                If (Not shpList.Item(nextShape).Name.Trim().StartsWith("Banner") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Classic") And Not shpList.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not shpList.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not shpList.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape4, dstShape4 As Visio.Shape
+                                    srcShape4 = (shpList.Item(nextShape))
+                                    If i = 1 Then
+                                        keep.Add(srcShape4)
+                                    End If
+                                    'srcShape44 = (oShapes.Item(nextShape))
+                                    Dim cellX As Double = srcShape4.Cells("PinX").ResultIU
+                                    Dim cellY As Double = srcShape4.Cells("PinY").ResultIU
 
 
-                    ' Paste additional copies of stage 5 to reflect how many performance and robustness copies we need
-                    ' Relabel text in shapes to reflect number of copies of stage 5
-                    ' These are copy instances
-                    Dim todo As Integer
+                                    'Paste into Overview
+                                    'Dim stage6 As Integer = 6
+                                    dstShape4 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape4, point.X + cellX + move, point.Y + cellY)
+
+                                    'Amend the shape identifiers in the shape text to reflect how many copies we have
+                                    Dim currentVal As Integer = dstShape4.CellsU("LockTextEdit").ResultIU
+                                    dstShape4.CellsU("LockTextEdit").ResultIU = 0
+                                    Dim newString As String = ReplaceString(dstShape4.Characters, i, suffix)
+                                    dstShape4.Text = newString
+                                    dstShape4.CellsU("LockTextEdit").ResultIU = currentVal
+                                    'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+
+                                    'Connect the top shape from this stage to the circle where we chose how many copies we wanted
+                                    If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
+                                        Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
+                                        Dim fShape As Visio.Shape
+                                        If isLeftCircle Then
+                                            fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
+                                        Else
+                                            fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleRight")
+                                        End If
+                                        'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
+                                        'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
+                                        fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
+
+                                    End If
+                                    ''Connect the top shape from this stage to the circle where we chose how many copies we wanted
+                                    'If dstShape4.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
+                                    '    Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
+                                    '    'cShape.NameU = "DynamicConnector2-5-" + i.ToString
+                                    '    Dim fShape As Visio.Shape
+                                    '    Dim fShapeTmp As Visio.Shape
+                                    '    If isLeftCircle Then
+                                    '        fShapeTmp = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
+                                    '        If fShapeTmp IsNot Nothing Then
+                                    '            HandleMouseEvents.ReplaceShapeWithRectangle(fShapeTmp, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft", ThisAddIn.getNumPerformanceSRs().ToString)
+                                    '        End If
+                                    '        fShape = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft")
+
+                                    '    Else
+                                    '        fShapeTmp = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleRight")
+                                    '        If fShapeTmp IsNot Nothing Then
+                                    '            HandleMouseEvents.ReplaceShapeWithRectangle(fShapeTmp, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareRight", ThisAddIn.getNumRobustnessSRs().ToString)
+                                    '        End If
+                                    '        fShape = ThisAddIn.getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareRight")
+                                    '    End If
+                                    '    'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
+                                    '    'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
+                                    '    fShape.AutoConnect(dstShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
+                                    '    'cShape.CellsU("LinePattern").ResultIU = 23
+                                    'End If
+                                    'Paste into stage 5 Assurance Argument Pattern
+                                    'We alread have it once so paste (howMany - 1) times
+                                    'If (i > 1) Then
+                                    'dstShape44 = 
+                                    'Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Assurance Argument Pattern for ML Verification").Drop(srcShape44, cellX + move, cellY)
+                                    'ThisAddIn.Application_ShapeFill(dstShape44, 5)
+                                    'End If
+
+                                End If
+                                'get a copy of the outlining rectangle and text
+                                If (shpList.Item(nextShape).Name.Trim().StartsWith("Classic")) Then
+                                    Dim s As String = oShapes.Item(nextShape).Name.Trim()
+                                    outline = shpList.Item(nextShape)
+                                End If
+                            Next nextShape
+                        Next i
+
+
+                        ' Paste additional copies of stage 5 to reflect how many performance and robustness copies we need
+                        ' Relabel text in shapes to reflect number of copies of stage 5
+                        ' These are copy instances
+                        Dim todo As Integer
+                    Dim leftHowMany As Integer
                     If isLeftCircle Then
-                        todo = 2
+                        If NumSRs.GetNumRobustnessSRs = 0 Then
+                            todo = 2
+                        Else
+                            todo = 2
+                            leftHowMany = howMany
+                            howMany = otherHowMany
+                            suffix = "R"
+                        End If
                     Else
                         If NumSRs.GetNumPerformanceSRs = 0 Then
                             todo = 2
@@ -353,49 +637,59 @@ Friend Class CreateOverview
 
                     End If
                     For i As Integer = todo To howMany
-                        'Copy and paste shape to the Overview.
-                        'We exclude some shapes we do not want to copy.
-                        For nextShape = 0 To keep.Count - 1
-                            If (Not keep.Item(nextShape).Name.Trim().StartsWith("Banner") And Not keep.Item(nextShape).Name.Trim().StartsWith("Classic") And Not keep.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not keep.Item(nextShape).Name.Trim().StartsWith("References")) Then
-                                Dim srcShape44, dstShape44 As Visio.Shape
-                                srcShape44 = (keep.Item(nextShape))
-                                Dim cellX As Double = srcShape44.Cells("PinX").ResultIU
-                                Dim cellY As Double = srcShape44.Cells("PinY").ResultIU
-                                Dim move As Double
-                                If isLeftCircle Then
-                                    move = (i - 1) * widthOffset
-                                Else
-                                    move = (i - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
-                                End If
-
-                                'Paste into stage 5 Assurance Argument Pattern
-                                'We alread have it once so paste (howMany - 1) times
-                                'If (i > 1) Then
-                                dstShape44 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(index)).Drop(srcShape44, cellX + move, cellY)
-                                Dim currentVal As Integer = dstShape44.CellsU("LockTextEdit").ResultIU
-                                dstShape44.CellsU("LockTextEdit").ResultIU = 0
-                                Dim newString As String = ReplaceString(dstShape44.Characters, i, suffix)
-                                dstShape44.Text = newString
-                                dstShape44.CellsU("LockTextEdit").ResultIU = currentVal
-                                'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
-
-                                'ThisAddIn.Application_ShapeFill(dstShape44, 5)
-                                'End If
-
-                            End If
-
-                        Next nextShape
-                        ' Paste a copy of the outlining rectangle and text
-                        If (Not outline Is Nothing) Then
-                            Dim cellX As Double = outline.Cells("PinX").ResultIU
-                            Dim cellY As Double = outline.Cells("PinY").ResultIU
+                            'Copy and paste shape to the Overview.
+                            'We exclude some shapes we do not want to copy.
                             Dim move As Double
                             If isLeftCircle Then
-                                move = (i - 1) * widthOffset
+                                If NumSRs.GetNumRobustnessSRs() = 0 Then
+                                    move = (i - 1) * widthOffset
+                                Else
+                                    move = (i - 1) * widthOffset + (leftHowMany * widthOffset)
+                                End If
+
                             Else
                                 move = (i - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
                             End If
-                            Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(index)).Drop(outline, cellX + move, cellY)
+                            For nextShape = 0 To keep.Count - 1
+                                If (Not keep.Item(nextShape).Name.Trim().StartsWith("Banner") And Not keep.Item(nextShape).Name.Trim().StartsWith("Classic") And Not keep.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not keep.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not keep.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape44, dstShape44 As Visio.Shape
+                                    srcShape44 = (keep.Item(nextShape))
+                                    Dim cellX As Double = srcShape44.Cells("PinX").ResultIU
+                                    Dim cellY As Double = srcShape44.Cells("PinY").ResultIU
+
+
+                                    'Paste into stage 5 Assurance Argument Pattern
+                                    'We alread have it once so paste (howMany - 1) times
+                                    'If (i > 1) Then
+                                    dstShape44 = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(index)).Drop(srcShape44, cellX + move, cellY)
+                                    Dim currentVal As Integer = dstShape44.CellsU("LockTextEdit").ResultIU
+                                    dstShape44.CellsU("LockTextEdit").ResultIU = 0
+                                    Dim newString As String = ReplaceString(dstShape44.Characters, i, suffix)
+                                    dstShape44.Text = newString
+                                    dstShape44.CellsU("LockTextEdit").ResultIU = currentVal
+                                    'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+
+                                    'ThisAddIn.Application_ShapeFill(dstShape44, 5)
+                                    'End If
+
+                                End If
+
+                            Next nextShape
+                            ' Paste a copy of the outlining rectangle and text
+                            If (Not outline Is Nothing) Then
+                            Dim cellX As Double = outline.Cells("PinX").ResultIU
+                            Dim cellY As Double = outline.Cells("PinY").ResultIU
+                                'Dim move As Double
+                                '    If isLeftCircle Then
+                                '    If NumSRs.GetNumRobustnessSRs() = 0 Then
+                                '        move = (i - 1) * widthOffset
+                                '    Else
+                                '        move = (i - 1) * widthOffset + (leftHowMany * widthOffset)
+                                '    End If
+                                'Else
+                                '    move = (i - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
+                                'End If
+                                Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(index)).Drop(outline, cellX + move, cellY)
                         End If
 
                     Next
@@ -408,26 +702,26 @@ Friend Class CreateOverview
                         Globals.ThisAddIn.Application.ActiveWindow.DeselectAll()
                         visSelection = Globals.ThisAddIn.Application.ActiveWindow.Selection
                         For nextShape = 0 To keep.Count - 1
-                            If (Not keep.Item(nextShape).Name.Trim().StartsWith("Banner") And Not keep.Item(nextShape).Name.Trim().StartsWith("Classic") And Not keep.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not keep.Item(nextShape).Name.Trim().StartsWith("References")) Then
-                                Dim srcShape44 As Visio.Shape
-                                srcShape44 = (keep.Item(nextShape))
-                                Dim currentVal As Integer = srcShape44.CellsU("LockTextEdit").ResultIU
-                                srcShape44.CellsU("LockTextEdit").ResultIU = 0
-                                Dim newString As String = ReplaceString(srcShape44.Characters, 1, suffix)
-                                srcShape44.Text = newString
-                                srcShape44.CellsU("LockTextEdit").ResultIU = currentVal
-                                'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
+                                If (Not keep.Item(nextShape).Name.Trim().StartsWith("Banner") And Not keep.Item(nextShape).Name.Trim().StartsWith("Classic") And Not keep.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not keep.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not keep.Item(nextShape).Name.Trim().StartsWith("References")) Then
+                                    Dim srcShape44 As Visio.Shape
+                                    srcShape44 = (keep.Item(nextShape))
+                                    Dim currentVal As Integer = srcShape44.CellsU("LockTextEdit").ResultIU
+                                    srcShape44.CellsU("LockTextEdit").ResultIU = 0
+                                    Dim newString As String = ReplaceString(srcShape44.Characters, 1, suffix)
+                                    srcShape44.Text = newString
+                                    srcShape44.CellsU("LockTextEdit").ResultIU = currentVal
+                                    'vsoCharacters1.Text = Replace(vsoStrng, vsoFind, vsoReplace)
 
-                                'ThisAddIn.Application_ShapeFill(dstShape44, 5)
-                                'End If
-                                visSelection.Select(srcShape44, Visio.VisSelectArgs.visSelect)
+                                    'ThisAddIn.Application_ShapeFill(dstShape44, 5)
+                                    'End If
+                                    visSelection.Select(srcShape44, Visio.VisSelectArgs.visSelect)
 
-                            End If
+                                End If
 
-                        Next nextShape
+                            Next nextShape
                     End If
-
-                Else
+                End If
+            Else
                     'All stages except stage 5
                     'Dim vsoSelection As Visio.Selection
                     'vsoSelection = Globals.ThisAddIn.Application.ActiveWindow.Selection
@@ -443,7 +737,7 @@ Friend Class CreateOverview
                     For nextShape = 1 To oShapes.Count
                         'Copy and paste shape to the Overview.
                         'We exclude some shapes we do not want to copy.
-                        If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling")) Then
+                        If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling")) Then
                             Dim srcShape, dstShape As Visio.Shape
                             srcShape = (oShapes.Item(nextShape))
 
@@ -472,16 +766,27 @@ Friend Class CreateOverview
         TidyShapes()
         AddButton()
 
+
     End Sub
-    Public Shared Sub Update_Overview()
+
+    'Update the overviews (2 pages).
+    'Activated by user request - button click.
+    Public Shared Sub Update_Overview(ByVal isperfSRsSet As Boolean, ByVal isrobSRsSet As Boolean)
         Dim howmany As Integer = NumSRs.GetNumPerformanceSRs() + NumSRs.GetNumRobustnessSRs()
         Dim widthOffset As Double = 10.5
         Dim offset As Double = 0.0
-        offset = (NumSRs.GetNumRobustnessSRs() - 1) * widthOffset + (NumSRs.GetNumPerformanceSRs() * widthOffset)
+        Dim numRSRs As Integer = NumSRs.GetNumRobustnessSRs()
+        Dim numPSRs As Integer = NumSRs.GetNumPerformanceSRs()
+        If (numRSRs = 0) And (numPSRs = 0) Then
+            offset = 0
+        Else
+            offset = (numRSRs - 1) * widthOffset + (numPSRs * widthOffset)
+        End If
+
         Dim suffix As String
 
-        Dim stageMultiOverview As Integer = 6
-        Call ThisAddIn.DeleteShapes_Selection(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)))
+        'Dim stageMultiOverview As Integer = 6
+        Call ThisAddIn.DeleteShapes_Selection(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "Buttons")
 
         'Process each stage, get all shapes from the stage in a list, get the height and width of the stage shapes bounding box for layout
         Dim strMasterNames() As String = Nothing 'dummy so we can see the list of pages
@@ -507,56 +812,61 @@ Friend Class CreateOverview
                 'https://stackoverflow.com/questions/32405404/vba-change-the-color-of-a-rounded-rectangle-in-visio
                 'https://www.office-forums.com/threads/re-shape-protection-and-or-layer-properties-prevent-complete-execution-of-this-command.49668/
                 If (4 = index) Then 'Stage 5 - treat this differently
-                    'Get the current selection.
-                    Dim visSelection As Visio.Selection
-                    Globals.ThisAddIn.Application.ActiveWindow.DeselectAll()
-                    visSelection = Globals.ThisAddIn.Application.ActiveWindow.Selection
-                    Dim goal_5_1_counter = 0
-                    For nextShape = 1 To oShapes.Count
-                        'Copy and paste shape to the Overview.
-                        'We exclude some shapes we do not want to copy.
-                        If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling")) Then
-                            Dim srcShape, dstShape As Visio.Shape
-                            srcShape = (oShapes.Item(nextShape))
+                    If ((numPSRs = 0) And (numRSRs = 0) And (isperfSRsSet)) Or ((numPSRs = 0) And (numRSRs = 0) And (isrobSRsSet)) Then
+                        'Just make space and draw nothing
+                    Else
 
-                            visSelection.Select(srcShape, Visio.VisSelectArgs.visSelect)
-                            Dim cellX As Double = srcShape.Cells("PinX").ResultIU
-                            Dim cellY As Double = srcShape.Cells("PinY").ResultIU
-                            dstShape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape, point.X + cellX, point.Y + cellY)
+                        'Get the current selection.
+                        Dim visSelection As Visio.Selection
+                        Globals.ThisAddIn.Application.ActiveWindow.DeselectAll()
+                        visSelection = Globals.ThisAddIn.Application.ActiveWindow.Selection
+                        Dim goal_5_1_counter = 0
+                        For nextShape = 1 To oShapes.Count
+                            'Copy and paste shape to the Overview.
+                            'We exclude some shapes we do not want to copy.
+                            If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling")) Then
+                                Dim srcShape, dstShape As Visio.Shape
+                                srcShape = (oShapes.Item(nextShape))
 
-                            'https://stackoverflow.com/questions/56809118/update-the-fill-colour-of-each-shape-immediately-after-it-is-changed-in-a-loop
-                            'https://stackoverflow.com/questions/37413207/visio-change-color-of-all-child-elements-using-vba
+                                visSelection.Select(srcShape, Visio.VisSelectArgs.visSelect)
+                                Dim cellX As Double = srcShape.Cells("PinX").ResultIU
+                                Dim cellY As Double = srcShape.Cells("PinY").ResultIU
+                                dstShape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Drop(srcShape, point.X + cellX, point.Y + cellY)
 
-                            'Dim lngShapeIDs() As Integer
-                            'lngShapeIDs = srcShape.GluedShapes(Visio.VisGluedShapesFlags.visGluedShapesOutgoing1D, "")
-                            'For intCount = 0 To UBound(lngShapeIDs)
-                            '    adjMatrix.Add(New KeyValuePair(Of Visio.Shape, Visio.Shape)(srcShape, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(index)).Shapes.ItemFromID(lngShapeIDs(intCount))))
-                            'Next
-                            'Connect the top shape from this stage to the circle where we chose how many copies we wanted
-                            If dstShape.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
-                                Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
-                                Dim fShape As Visio.Shape = Nothing
-                                If goal_5_1_counter < NumSRs.GetNumPerformanceSRs Then
-                                    fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft")
-                                    If (fShape Is Nothing) Then
-                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
+                                'https://stackoverflow.com/questions/56809118/update-the-fill-colour-of-each-shape-immediately-after-it-is-changed-in-a-loop
+                                'https://stackoverflow.com/questions/37413207/visio-change-color-of-all-child-elements-using-vba
+
+                                'Dim lngShapeIDs() As Integer
+                                'lngShapeIDs = srcShape.GluedShapes(Visio.VisGluedShapesFlags.visGluedShapesOutgoing1D, "")
+                                'For intCount = 0 To UBound(lngShapeIDs)
+                                '    adjMatrix.Add(New KeyValuePair(Of Visio.Shape, Visio.Shape)(srcShape, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(index)).Shapes.ItemFromID(lngShapeIDs(intCount))))
+                                'Next
+                                'Connect the top shape from this stage to the circle where we chose how many copies we wanted
+                                If dstShape.Name.Trim().StartsWith("Instantiable_goal_5_1") Then
+                                    Dim cShape As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).Shapes("Dynamic connector")
+                                    Dim fShape As Visio.Shape = Nothing
+                                    If goal_5_1_counter < NumSRs.GetNumPerformanceSRs Then
+                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareLeft")
+                                        If (fShape Is Nothing) Then
+                                            fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleLeft")
+                                        End If
+                                    Else
+                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareRight")
+                                        If (fShape Is Nothing) Then
+                                            fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleRight")
+                                        End If
                                     End If
-                                Else
-                                    fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleToSquareRight")
-                                    If (fShape Is Nothing) Then
-                                        fShape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "CircleRight")
-                                    End If
+                                    'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
+                                    'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
+                                    fShape.AutoConnect(dstShape, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
+                                    'cShape.CellsU("LinePattern").ResultIU = 23
+                                    goal_5_1_counter += 1
+
                                 End If
-                                'Dim tShape As Visio.Shape = getShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU("Overview"), "Goal (Stage 2)")
-                                'circShape.AutoConnect(visioRectShape, VisAutoConnectDir.visAutoConnectDirNone, vsoConnectorShape)
-                                fShape.AutoConnect(dstShape, Visio.VisAutoConnectDir.visAutoConnectDirNone, cShape)
-                                'cShape.CellsU("LinePattern").ResultIU = 23
-                                goal_5_1_counter += 1
 
                             End If
-
-                        End If
-                    Next nextShape
+                        Next nextShape
+                    End If
 
 
                 Else
@@ -575,7 +885,7 @@ Friend Class CreateOverview
                     For nextShape = 1 To oShapes.Count
                         'Copy and paste shape to the Overview.
                         'We exclude some shapes we do not want to copy.
-                        If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling")) Then
+                        If (Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Banner") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("CommandButton") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Classic") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Buttons") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("References") And Not oShapes.Item(nextShape).Name.Trim().StartsWith("Dangling")) Then
                             Dim srcShape, dstShape As Visio.Shape
                             srcShape = (oShapes.Item(nextShape))
 
@@ -602,6 +912,7 @@ Friend Class CreateOverview
         Next
         TidyShapes()
         AddButton()
+
     End Sub
 
     Shared Sub TryAddImage(vPg As Integer, imageFileStr As String, x As Double, y As Double, width As Double, height As Double)
@@ -620,7 +931,7 @@ Friend Class CreateOverview
         End If
     End Sub
 
-
+    'Add an image to a shape - can be used for buttons
     Private Shared Function AddImageShape(vPg As Integer, fileName As String) As Visio.Shape
         Dim vPage As Visio.Page = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(vPg))
         Dim shpNew As Visio.Shape = Nothing
@@ -641,8 +952,12 @@ Friend Class CreateOverview
         AddImageShape = shpNew
         'Return shpNew
     End Function
+
+    'Add a refresh and update button to the Multi-Overview page.
+    'Does not use an image - draws an arrow instead. Otherwise we need 
+    'to include an image file and that is likely to be a hornet's nest of issues.
     Private Shared Sub AddButton()
-        Dim stageMultiOverview As Integer = 6
+        'Dim stageMultiOverview As Integer = 6
         Dim left As Double = 1.5
         Dim right As Double = 2.5
         Dim bottom As Double = 20
@@ -655,8 +970,9 @@ Friend Class CreateOverview
         rc.NameU = "Refresh"
         rc.CellsU("Fillforegnd").FormulaForceU = "RGB(211,211,211)"
         'This throws an error
-        'Dim rStr As String = "Refresh and Update the Overview"
+        Dim rStr As String = """Refresh And Update the Overview"""
         'rc.CellsU("comment").FormulaForce = rStr
+        rc.CellsU("Comment").Formula = rStr
 
         'rc.ChangePicture("refresh_update.png")
         'Dim fname As String = My.Computer.FileSystem.CurrentDirectory + "\\refresh_update.png"
@@ -664,7 +980,23 @@ Friend Class CreateOverview
         Dim ac As Visio.Shape = Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)).DrawCircularArc(x, y, 0.4, 0, 5.25)
         ac.CellsU("BeginArrow").FormulaU = "4"
         ac.CellsU("LineWeight").FormulaU = "7 pt"
+        MoveButtons(left, bottom, right, top)
     End Sub
+
+    Private Shared Sub MoveButtons(left As Double, bottom As Double, right As Double, top As Double)
+        Try
+            Dim shp As Visio.Shape = ThisAddIn.GetShapeByName(Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(stageMultiOverview)), "Buttons")
+            shp.CellsU("PinX").ResultIU = ((left + right) / 2) - 1
+            shp.CellsU("PinY").ResultIU = ((bottom + top) / 2)
+        Catch errorThrown As Exception
+            System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+        End Try
+
+
+    End Sub
+    'Once we have created the Overview, we need to pass over it tidying the shapes.
+    'Connects the sections together and reconnects any connections that have become
+    'detached during processing.
     Private Shared Sub TidyShapes()
 
         'Connect all shapes on stage 5 Assurance Argument Pattern for ML Verification page
@@ -697,15 +1029,18 @@ Friend Class CreateOverview
         fromShape4.AutoConnect(toShape4, Visio.VisAutoConnectDir.visAutoConnectDirNone, connectShape4)
     End Sub
 
-    Private Shared Function GetAllSubShapes(ShpObj As Visio.Shape, SubShapes As List(Of Visio.Shape), Optional AddFirstShp As Boolean = False)
-        If AddFirstShp Then SubShapes.Add(ShpObj)
-        Dim CheckShp As Visio.Shape
-        For Each CheckShp In ShpObj.Shapes
-            SubShapes.Add(CheckShp)
-            Call GetAllSubShapes(CheckShp, SubShapes, False)
-        Next CheckShp
-    End Function
+    'Private Shared Function GetAllSubShapes(ShpObj As Visio.Shape, SubShapes As List(Of Visio.Shape), Optional AddFirstShp As Boolean = False)
+    'If AddFirstShp Then SubShapes.Add(ShpObj)
+    '  Dim CheckShp As Visio.Shape
+    '  For Each CheckShp In ShpObj.Shapes
+    '       SubShapes.Add(CheckShp)
+    '       Call GetAllSubShapes(CheckShp, SubShapes, False)
+    '  Next CheckShp
+    'End Function
 
+    'Reconnect dangling connections.
+    'Uses a threshold distance, any shape-connection pairs that are closer
+    'than the threshold will be reconnected.
     Private Shared Sub Reconnect(stageNameIndex As Integer)
         'http://visguy.com/vgforum/index.php?topic=5773.15
         Dim cons As Visio.Selection

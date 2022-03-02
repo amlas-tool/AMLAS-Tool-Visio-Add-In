@@ -3,6 +3,8 @@ Imports System.Runtime.InteropServices
 Imports System.Diagnostics
 
 'https://www.programmingalgorithms.com/algorithm/depth-first-traversal/vb-net/
+'Post-order depth-first search class for removing all shapes below a specified
+'shape in the page's shape tree.
 Friend Class DFS
 	Public Structure Vertex
 		Public shape As Visio.Shape
@@ -100,7 +102,186 @@ Friend Class DFS
 		Next
 		Return -1
 	End Function
-	'Post-order depth first search - tree traversal with deletion
+
+	'Tidy the left hand branch of the tree (flowchart) on stage 5 argument pattern.
+	Public Shared Sub TidyLeft(ByRef activePage As Microsoft.Office.Interop.Visio.Page, ByRef inShp As Visio.Shape)
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("EmptyDiamondL") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch ex As Exception
+
+		End Try
+	End Sub
+
+	'Tidy the right hand branch of the tree (flowchart) on stage 5 argument pattern.
+	'This is super inefficient but we need to get and remove the shapes in the correct order.
+	'We could have a single loop and find the shapes within one loop. However, this does not
+	'guarantee the order and the deletion does not work. Also, some shapes are hidden and
+	'onluy dscoverable when another 'higher' shape has gone.
+	Public Shared Sub TidyRight(ByRef activePage As Microsoft.Office.Interop.Visio.Page, ByRef inShp As Visio.Shape)
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("J5_2Group") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("EmptyTriGroup") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("C5_2Group") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("JustificationGrouping") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().Equals("Ellipse") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("SheetEmptyTriangle") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("JustificationLetterJ") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+		Try
+			For Each shp In activePage.Shapes
+				If shp.Name.Trim().StartsWith("EmptyDiamondR") Then
+					shp.CellsU("LockDelete").ResultIU = 0
+					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+					shp.CellsU("LockFromGroupFormat").ResultIU = 0
+					'val.Ungroup()
+					Debug.Write(shp.NameU + ", ")
+					Dim selToDel As Visio.Selection
+					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+					selToDel.Delete()
+					Exit For
+				End If
+			Next shp
+		Catch errorThrown As Exception
+			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
+		End Try
+
+
+
+	End Sub
+
+	'Post-order depth first search - tree traversal with deletion.
+	'Removes the required branch of the tree (flowchart) on stage 5 argument pattern
 	Public Shared Sub DepthFirstSearch(ByRef activePage As Microsoft.Office.Interop.Visio.Page, max As Integer, shapes As Visio.Shapes, shp As Visio.Shape)
 		'Stack to store nodes during traversal
 		Dim stack As Integer() = New Integer(max - 1) {}
@@ -144,15 +325,15 @@ Friend Class DFS
 			Dim shpIDs() As Integer
 			'Get the 1-D shapes (arrows) connected to this shape (out connections) - if there are any
 			shpIDs = shp.GluedShapes(Visio.VisGluedShapesFlags.visGluedShapesOutgoing1D, "")
-			For i = 0 To UBound(shpIDs)
-				Debug.Print("Out 1d " + activePage.Shapes.ItemFromID(shpIDs(i)).NameU)
-			Next
+			'For i = 0 To UBound(shpIDs)
+			'Debug.Print("Out 1d " + activePage.Shapes.ItemFromID(shpIDs(i)).NameU)
+			'Next
 			'Add the 2-D shapes connected to this shape (out connections)
 			shpIDs = shpIDs.Union(shp.GluedShapes(Visio.VisGluedShapesFlags.visGluedShapesOutgoing2D, "")).Distinct().ToArray
 			'MsgBox "Outgoing 2D shapes"
-			For i = 0 To UBound(shpIDs)
-				Debug.Print("Out all " + activePage.Shapes.ItemFromID(shpIDs(i)).Name)
-			Next
+			'For i = 0 To UBound(shpIDs)
+			'Debug.Print("Out all " + activePage.Shapes.ItemFromID(shpIDs(i)).Name)
+			'Next
 			'Process nodes - add them to the stack and mark them visited in the node array
 			For i = 0 To (shpIDs.Length - 1)
 				Dim v As Integer = _vertexCount

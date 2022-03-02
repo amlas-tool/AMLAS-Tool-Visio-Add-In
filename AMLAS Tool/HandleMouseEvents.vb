@@ -44,6 +44,8 @@ Friend Class HandleMouseEvents
 
     End Function
 
+    'Replace a specified shape with a rectangle. Used to indcate when an option shape has been processed.
+    'Used for circles on argument pattern stage 2 and diamond on argument pattern stage 5.
     Friend Shared Sub ReplaceShapeWithRectangle(cShape As Visio.Shape, page As Visio.Page, newName As String, text As String)
         Dim currentVal1 As Integer = cShape.CellsU("LockDelete").ResultIU
         Dim currentVal2 As Integer = cShape.CellsU("LockGroup").ResultIU
@@ -72,7 +74,7 @@ Friend Class HandleMouseEvents
         cShape.CellsU("LockFromGroupFormat").ResultIU = currentVal3
     End Sub
 
-    'Detect when the user clicks on somehting - mouseDown event
+    'Detect when the user clicks on something - mouseDown event
     'Calls diiferent functionality depending where they clicked
     Friend Shared Sub HandleMouseDown(ByVal mouseButton As Integer,
             ByVal buttonState As Integer,
@@ -170,7 +172,7 @@ Friend Class HandleMouseEvents
                         ' Display message, title, and default value.
                         MyValue = InputBox(getMessage, Title, DefaultVal)
                         If ((Not MyValue Is Nothing) And (Not MyValue = "")) Then
-                            Dim num As Integer
+                            Dim num As Integer = -99999
                             'If TypeOf MyValue Is Integer Then
                             Try
                                 num = CInt(Int(Convert.ToString(MyValue)))
@@ -189,12 +191,8 @@ Friend Class HandleMouseEvents
                                 End If
                                 If (num >= 0 And num < 7) Then
                                     'Swap filled left circle with empty square
-                                    'Dim visioDocs As Visio.Documents = Globals.ThisAddIn.Application.Documents
-                                    'Dim rep As Object = visioDocs("AMLAS Tool Stencil.vssx").Masters("Clear Diamond")
-                                    'targetShape.ReplaceShape(rep)
-                                    'Dim page As String = 
                                     ReplaceShapeWithRectangle(circLeftShape, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(1)), "CircleToSquareLeft", NumSRs.GetNumPerformanceSRs.ToString)
-                                    CreateOverview.Update_Overview()
+                                    CreateOverview.Update_Overview(True, NumSRs.GetNumRobustnessSRsSet)
                                     MsgBox("We have added new instances to Stage 5 Argument Patterns" + vbCrLf + "and updated the Multi-Overview to reflect the additions.")
                                 End If
                             Catch ex As Exception
@@ -202,7 +200,7 @@ Friend Class HandleMouseEvents
                             End Try
 
                         End If
-                        NumSRs.WriteSRsToFile()
+                        NumSRs.WriteSRsToFile(True, NumSRs.GetNumRobustnessSRsSet)
                     End If
                     'If the user clicked the right circle then process their responses
                     'We will create an overview page and set the number of robustness SRs
@@ -235,12 +233,8 @@ Friend Class HandleMouseEvents
                                 End If
                                 If (num >= 0 And num < 7) Then
                                     'Swap filled right circle with empty square
-                                    'Dim visioDocs As Visio.Documents = Globals.ThisAddIn.Application.Documents
-                                    'Dim rep As Object = visioDocs("AMLAS Tool Stencil.vssx").Masters("Clear Diamond")
-                                    'targetShape.ReplaceShape(rep)
-                                    'Dim page As String = "Stage 2: Assurance Argument Pattern for ML Safety Requirements"
                                     ReplaceShapeWithRectangle(circRightShape, Globals.ThisAddIn.Application.ActiveDocument.Pages.ItemU(ThisAddIn.stageNames(1)), "CircleToSquareRight", NumSRs.GetNumRobustnessSRs.ToString)
-                                    CreateOverview.Update_Overview()
+                                    CreateOverview.Update_Overview(NumSRs.GetNumPerformanceSRsSet, True)
                                     MsgBox("We have added new instances to Stage 5 Argument Patterns" + vbCrLf + "and updated the Multi-Overview to reflect the additions.")
                                 End If
                             Catch ex As Exception
@@ -248,23 +242,11 @@ Friend Class HandleMouseEvents
                             End Try
 
                         End If
-                        NumSRs.WriteSRsToFile()
+                        NumSRs.WriteSRsToFile(NumSRs.GetNumPerformanceSRsSet, True)
                     End If
                     'If the user clicked the diamond then process their responses
                     'We will remove the left or right branch of stage 5
                     If ((clickedWindow.Application.AlertResponse = 0) And isDiamond) Then
-                        'Dim strMasterNames As String() = Nothing
-                        'Globals.ThisAddIn.Application.ActiveDocument.Pages.GetNamesU(strMasterNames)
-                        'Dim intLowerBound As Integer = LBound(strMasterNames)
-                        'Dim intUpperBound As Integer = UBound(strMasterNames)
-                        'Debug.Print(Globals.ThisAddIn.Application.ActiveDocument.Name + " Lower bound:" + intLowerBound.ToString + " Upper bound:" + intUpperBound.ToString + vbCrLf)
-
-                        'While intLowerBound <= intUpperBound
-
-                        '    Debug.Print(strMasterNames(intLowerBound) + vbCrLf)
-                        '    intLowerBound = intLowerBound + 1
-
-                        'End While
 
                         'Ask the user which branch (below the diamond) they want deleted
                         ' and delete it.
@@ -281,12 +263,15 @@ Friend Class HandleMouseEvents
                                 Dim shp As Visio.Shape = ThisAddIn.ListNextConnections(Globals.ThisAddIn.Application.ActivePage, targetShape, MyValue.ToString.Trim.ToLower)
                                 If (Not shp Is Nothing) Then
                                     'Post-order depth-first traversal to remove the branch we want deleted
-                                    'Dim dfs As New DFS()
                                     'Count maximum number of shapes we could traverse (how many shapes on this page?).
                                     Dim max As Integer = Globals.ThisAddIn.Application.ActivePage.Shapes.Count
                                     Debug.Write("Depth First Search: ")
                                     DFS.DepthFirstSearch(Globals.ThisAddIn.Application.ActivePage, max, Globals.ThisAddIn.Application.ActivePage.Shapes, shp)
-
+                                    If (MyValue.ToString.Trim.ToLower = "left") Then
+                                        DFS.TidyLeft(Globals.ThisAddIn.Application.ActivePage, shp)
+                                    Else
+                                        DFS.TidyRight(Globals.ThisAddIn.Application.ActivePage, shp)
+                                    End If
                                     'Tidy up (reset) counters
                                     DFS.ResetVertexCount()
                                     DFS.ResetNodeCount()
@@ -298,12 +283,8 @@ Friend Class HandleMouseEvents
                                     selToDel.Delete()
 
                                     'Swap filled diamond (choice) with empty diamond
-                                    'Dim visioDocs As Visio.Documents = Globals.ThisAddIn.Application.Documents
-                                    'Dim rep As Object = visioDocs("AMLAS Tool Stencil.vssx").Masters("Clear Diamond")
-                                    'targetShape.ReplaceShape(rep)
-                                    'Dim page As String = Globals.ThisAddIn.Application.ActivePage.NameU
                                     ReplaceShapeWithRectangle(targetShape, Globals.ThisAddIn.Application.ActivePage, "DiamondToSquare", Nothing)
-                                    CreateOverview.Update_Overview()
+                                    CreateOverview.Update_Overview(NumSRs.GetNumPerformanceSRsSet, NumSRs.GetNumRobustnessSRsSet)
                                     MsgBox("We have removed the required branch" + vbCrLf + "and updated the Multi-Overview to reflect the removals.")
 
                                 End If
@@ -312,17 +293,17 @@ Friend Class HandleMouseEvents
                             End If
 
                         End If
-                        NumSRs.WriteSRsToFile()
+                        NumSRs.WriteSRsToFile(NumSRs.GetNumPerformanceSRsSet, NumSRs.GetNumRobustnessSRsSet)
                     End If
                     'If the user clicked the update overview button then process their responses
                     'We will update the multi-overview
                     If ((clickedWindow.Application.AlertResponse = 0) And isUpdateOverview) Then
                         Try
-                            CreateOverview.Update_Overview()
+                            CreateOverview.Update_Overview(NumSRs.GetNumPerformanceSRsSet, NumSRs.GetNumRobustnessSRsSet)
                         Catch ex As Exception
                             MsgBox(ex.Message)
                         End Try
-                        NumSRs.WriteSRsToFile()
+                        NumSRs.WriteSRsToFile(NumSRs.GetNumPerformanceSRsSet, NumSRs.GetNumRobustnessSRsSet)
                     End If
                 Else
                     If (clickedWindow.Application.AlertResponse = 0) Then

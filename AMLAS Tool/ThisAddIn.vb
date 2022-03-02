@@ -11,6 +11,8 @@ Public Class ThisAddIn
 
     Friend Shared numPerformanceSRs As Integer = 0
     Friend Shared numRobustnessSRs As Integer = 0
+    Friend Shared numPerformanceSRsSet As Boolean = 0
+    Friend Shared numRobustnessSRsSet As Boolean = 0
 
 
 
@@ -22,22 +24,23 @@ Public Class ThisAddIn
     'Friend Shared stage6NameU As String = "Stage 6: Assurance Argument Pattern for ML Model Deployment"
     'Friend Shared stageMultiOverviewNameU As String = "Multi-Overview"
 
+    'Array of Strings - the names of the argument pattern stages.
     Friend Shared stageNames() As String = {"Stage 1: Argument Pattern for ML Safety Assurance Scoping", "Stage 2: Assurance Argument Pattern for ML Safety Requirements", "Stage3: Assurance Argument Pattern for ML Data ", "Stage 4:  Assurance Argument Pattern for Model Learning", "Assurance Argument Pattern for ML Verification", "Stage 6: Assurance Argument Pattern for ML Model Deployment", "Multi-Overview"}
-
-
-
 
     'Add mouse event handler to window
     Private clickedWindow As Microsoft.Office.Interop.Visio.Window
 
-
+    'Store the number of performance and robustness safety requirements
+    'into the shape data when Visio doc is saved.
     Private Sub Document_DocumentSaved(ByVal doc As IVDocument)
-        NumSRs.WriteSRsToFile()
+        NumSRs.WriteSRsToFile(False, False)
 
     End Sub
 
+    'Store the number of performance and robustness safety requirements
+    'into the shape data when Visio doc is closed.
     Private Sub Document_BeforeDocumentClose(ByVal doc As IVDocument)
-        NumSRs.WriteSRsToFile()
+        NumSRs.WriteSRsToFile(False, False)
 
     End Sub
 
@@ -61,8 +64,11 @@ Public Class ThisAddIn
 
     End Sub
 
+    'Store the number of performance and robustness safety requirements
+    'into the shape data when Visio doc is shutdown.
     Private Sub ThisAddIn_Shutdown() Handles Me.Shutdown
         'myMouseListener = Nothing
+        NumSRs.WriteSRsToFile(False, False)
     End Sub
     <ComVisible(True)>
     Public Interface IAddInUtilities
@@ -104,10 +110,12 @@ Public Class ThisAddIn
                         If (myValue = "left" And outShape.Cells("PinX").ResultIU < x) Then
                             targetShape = outShape
                             x = outShape.Cells("PinX").ResultIU
+                            'Return targetShape
                         End If
                         If (myValue = "right" And outShape.Cells("PinX").ResultIU > x) Then
                             targetShape = outShape
                             x = outShape.Cells("PinX").ResultIU
+                            'Return targetShape
                         End If
                     End If
                 Next
@@ -162,6 +170,7 @@ Public Class ThisAddIn
         Return clickedShape
 
     End Function
+
     ' Find a shape (using shape's name as a string) on a specified Visio page and return it
     ' Uses Shape.NameU (shape's universal name) to match shapes
     Public Shared Function GetShapeByName(
@@ -238,7 +247,8 @@ Public Class ThisAddIn
 
     'Delete all shapes on a page
     'Disables shapes' protection prior to deletion.
-    Public Shared Sub DeleteShapes_Selection(ByRef visPg As Visio.Page)
+    'Optional parameter specifes name of shape to keep (deafault is space as empty string matches everything).
+    Public Shared Sub DeleteShapes_Selection(ByRef visPg As Visio.Page, Optional ByVal keepShape As String = " ")
 
         '// Create an EMPTY selection of shapes (we'll add shapes
         '// to it later):   
@@ -250,6 +260,67 @@ Public Class ThisAddIn
         '// shapes from *within* the loop.
         Dim shp As Visio.Shape
         For Each shp In visPg.Shapes
+            If Not shp.Name.Trim().StartsWith(keepShape) Then
+                shp.CellsU("LockDelete").ResultIU = 0
+                'shp.Protection.LockAspect.Value = False
+                shp.CellsU("LockBegin").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+                'shp.Protection.LockCalcWH.Value = False
+                'shp.Protection.LockCrop.Value = False
+                'shp.Protection.LockCustProp.Value = False
+                'shp.Protection.LockDelete.Value = False
+                shp.CellsU("LockEnd").ResultIU = 0 'shp.Protection.LockEnd.Value = True
+                'shp.Protection.LockFormat.Value = False
+                'shp.Protection.LockFromGroupFormat.Value = False
+                'shp.Protection.LockGroup.Value = False
+                'shp.Protection.LockHeight.Value = False
+                'shp.Protection.LockMoveX.Value = False
+                'shp.Protection.LockMoveY.Value = False
+                'shp.Protection.LockRotate.Value = False
+                'shp.Protection.LockSelect.Value = False
+                'shp.Protection.LockTextEdit.Value = False
+                shp.CellsU("LockThemeColors").ResultIU = 0 'shp.Protection.LockThemeColors.Value = True
+                shp.CellsU("LockThemeEffects").ResultIU = 0 'shp.Protection.LockThemeEffects.Value = True
+                'shp.Protection.LockVtxEdit.Value = False
+                '// Add shape to selection if it is 'wide', but don't
+                '// whack the shape here:
+                'If (m_filter_isWiderThan(shp, 25.4)) Then
+
+                '// Annoying Visio-syntax for (simply) selecting
+                '// a shape:
+                Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+            Else
+                System.Diagnostics.Debug.Write("Buttons excluded")
+            End If
+
+        Next
+
+        '// Delete the selection, if it is not empty:
+        If (selToDel.Count > 0) Then
+            '// This is where shapes get whacked:
+            selToDel.Delete()
+        End If
+
+        '// Cleanup:
+        'selToDel = Nothing
+        'shp = Nothing
+
+    End Sub
+
+
+    'Delete all shapes on a page
+    'Disables shapes' protection prior to deletion.
+    Public Shared Sub DeleteShapesBySelection(ByRef visPg As Visio.Page, ByRef visShps As List(Of Visio.Shape))
+
+        '// Create an EMPTY selection of shapes (we'll add shapes
+        '// to it later):   
+        Dim selToDel As Visio.Selection
+        selToDel = visPg.CreateSelection(
+   Visio.VisSelectionTypes.visSelTypeEmpty)
+
+        '// We can use For...Each again, because we're not deleting
+        '// shapes from *within* the loop.
+        Dim shp As Visio.Shape
+        For Each shp In visShps
             shp.CellsU("LockDelete").ResultIU = 0
             'shp.Protection.LockAspect.Value = False
             shp.CellsU("LockBegin").ResultIU = 0 'shp.Protection.LockBegin.Value = True
@@ -293,8 +364,56 @@ Public Class ThisAddIn
         'shp = Nothing
 
     End Sub
+    'Delete all shapes on a page
+    'Disables shapes' protection prior to deletion.
+    Public Shared Function AllShapes_Selection(ByRef visPg As Visio.Page) As Visio.Selection
 
-    'Detect when the user clicks on somehting - mouseDown event
+        '// Create an EMPTY selection of shapes (we'll add shapes
+        '// to it later):   
+        Dim selToDel As Visio.Selection
+        selToDel = visPg.CreateSelection(
+   Visio.VisSelectionTypes.visSelTypeEmpty)
+
+        '// We can use For...Each again, because we're not deleting
+        '// shapes from *within* the loop.
+        Dim shp As Visio.Shape
+        For Each shp In visPg.Shapes
+            shp.CellsU("LockDelete").ResultIU = 0
+            'shp.Protection.LockAspect.Value = False
+            shp.CellsU("LockBegin").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+            'shp.Protection.LockCalcWH.Value = False
+            'shp.Protection.LockCrop.Value = False
+            'shp.Protection.LockCustProp.Value = False
+            'shp.Protection.LockDelete.Value = False
+            shp.CellsU("LockEnd").ResultIU = 0 'shp.Protection.LockEnd.Value = True
+            'shp.Protection.LockFormat.Value = False
+            'shp.Protection.LockFromGroupFormat.Value = False
+            'shp.Protection.LockGroup.Value = False
+            'shp.Protection.LockHeight.Value = False
+            'shp.Protection.LockMoveX.Value = False
+            'shp.Protection.LockMoveY.Value = False
+            'shp.Protection.LockRotate.Value = False
+            'shp.Protection.LockSelect.Value = False
+            'shp.Protection.LockTextEdit.Value = False
+            shp.CellsU("LockThemeColors").ResultIU = 0 'shp.Protection.LockThemeColors.Value = True
+            shp.CellsU("LockThemeEffects").ResultIU = 0 'shp.Protection.LockThemeEffects.Value = True
+            'shp.Protection.LockVtxEdit.Value = False
+            '// Add shape to selection if it is 'wide', but don't
+            '// whack the shape here:
+            'If (m_filter_isWiderThan(shp, 25.4)) Then
+
+            '// Annoying Visio-syntax for (simply) selecting
+            '// a shape:
+            Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+
+            'End If
+
+        Next
+
+        Return selToDel
+    End Function
+
+    'Detect when the user clicks on something - mouseDown event
     'Calls diiferent functionality depending where they clicked
     Private Sub Application_MouseDown(ByVal mouseButton As Integer,
             ByVal buttonState As Integer,
