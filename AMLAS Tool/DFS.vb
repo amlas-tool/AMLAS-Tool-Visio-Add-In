@@ -105,19 +105,24 @@ Friend Class DFS
 
 	'Tidy the left hand branch of the tree (flowchart) on stage 5 argument pattern.
 	Public Shared Sub TidyLeft(ByRef activePage As Microsoft.Office.Interop.Visio.Page, ByRef inShp As Visio.Shape)
+		Dim x As Double = inShp.CellsU("PinX").ResultIU
+		Dim y As Double = inShp.CellsU("PinY").ResultIU
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("EmptyDiamondL") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
+
 				End If
 			Next shp
 		Catch ex As Exception
@@ -131,37 +136,45 @@ Friend Class DFS
 	'guarantee the order and the deletion does not work. Also, some shapes are hidden and
 	'onluy dscoverable when another 'higher' shape has gone.
 	Public Shared Sub TidyRight(ByRef activePage As Microsoft.Office.Interop.Visio.Page, ByRef inShp As Visio.Shape)
+		Dim x As Double = inShp.CellsU("PinX").ResultIU
+		Dim y As Double = inShp.CellsU("PinY").ResultIU
+
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("J5_2Group") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
+
 				End If
-			Next shp
+            Next shp
 		Catch errorThrown As Exception
 			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
 		End Try
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("EmptyTriGroup") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
 				End If
 			Next shp
 		Catch errorThrown As Exception
@@ -170,16 +183,18 @@ Friend Class DFS
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("C5_2Group") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
 				End If
 			Next shp
 		Catch errorThrown As Exception
@@ -188,16 +203,18 @@ Friend Class DFS
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("JustificationGrouping") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
 				End If
 			Next shp
 		Catch errorThrown As Exception
@@ -205,35 +222,41 @@ Friend Class DFS
 		End Try
 		Try
 			For Each shp In activePage.Shapes
-				If shp.Name.Trim().Equals("Ellipse") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+				If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+					If shp.Name.Trim().Equals("Ellipse") Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
+
 				End If
-			Next shp
+            Next shp
 		Catch errorThrown As Exception
 			System.Diagnostics.Debug.WriteLine(errorThrown.Message)
 		End Try
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("SheetEmptyTriangle") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
+
 				End If
 			Next shp
 		Catch errorThrown As Exception
@@ -242,16 +265,19 @@ Friend Class DFS
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("JustificationLetterJ") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 2.5) And shp.CellsU("PinX").ResultIU > (x - 2.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
+
 				End If
 			Next shp
 		Catch errorThrown As Exception
@@ -260,16 +286,19 @@ Friend Class DFS
 		Try
 			For Each shp In activePage.Shapes
 				If shp.Name.Trim().StartsWith("EmptyDiamondR") Then
-					shp.CellsU("LockDelete").ResultIU = 0
-					shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
-					shp.CellsU("LockFromGroupFormat").ResultIU = 0
-					'val.Ungroup()
-					Debug.Write(shp.NameU + ", ")
-					Dim selToDel As Visio.Selection
-					selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
-					Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
-					selToDel.Delete()
-					Exit For
+					If shp.CellsU("PinX").ResultIU < (x + 3.5) And shp.CellsU("PinX").ResultIU > (x - 0.5) Then
+						shp.CellsU("LockDelete").ResultIU = 0
+						shp.CellsU("LockGroup").ResultIU = 0 'shp.Protection.LockBegin.Value = True
+						shp.CellsU("LockFromGroupFormat").ResultIU = 0
+						'val.Ungroup()
+						Debug.Write(shp.NameU + ", ")
+						Dim selToDel As Visio.Selection
+						selToDel = activePage.CreateSelection(Visio.VisSelectionTypes.visSelTypeEmpty)
+						Call selToDel.Select(shp, Visio.VisSelectArgs.visSelect)
+						selToDel.Delete()
+						Exit For
+					End If
+
 				End If
 			Next shp
 		Catch errorThrown As Exception
